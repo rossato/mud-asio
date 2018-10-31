@@ -30,7 +30,7 @@ TEST_F(HelpTest, DumpHelpAboutAction)
     HelpAboutAction::Act(ken, ken.connection.output, 0, 0);
     std::cout << ken.connection.output.str() << std::endl;
 
-    EXPECT_NE(ken.connection.output.str().find("C++17 MUD Teaching Exercise"),
+    EXPECT_NE(ken.connection.output.str().find("C++11 MUD Project"),
               std::string::npos);
 }
 
@@ -64,7 +64,7 @@ TEST_F(HelpTest, HelpCommandParses)
 TEST_F(HelpTest, HelpAboutCommandParses)
 {
     ken.RunCommand("help about");
-    EXPECT_NE(ken.connection.output.str().find("C++17 MUD Teaching Exercise"),
+    EXPECT_NE(ken.connection.output.str().find("C++11 MUD Project"),
               std::string::npos);
 }
 
