@@ -1,0 +1,11 @@
+CMakeFiles/**
+CMake*
+cmake*
+!CMakeLists.txt
+Doxyfile*
+dump.txt
+html/**
+libmudlib.a
+Makefile
+mud
+mudtest
