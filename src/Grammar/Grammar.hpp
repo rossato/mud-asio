@@ -32,7 +32,7 @@ class Grammar
     friend class GrammarBuilder;
 
 public:
-    void Parse(World::User &user, std::ostream &response, Dictionary::Tokenizer &tok) const;
+    void Parse(Dictionary::Tokenizer &tok) const;
     
     using GrammarListType = std::vector<std::unique_ptr<GrammarLineBase> >;
     using GrammarIndexType = std::map<std::string, VerbInfo>;

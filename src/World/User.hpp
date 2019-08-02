@@ -19,21 +19,23 @@ class Server;
 namespace World
 {
 class Item;
-class Location;
 class World;
 
 class User : public Noun
 {
 public:
-    User(Mud::World::World &world, const std::string &name, Location &startingPlace);
+    User(Mud::World::World &world, const std::string &name, Noun &startingPlace);
 
     // Observer pointers are out there
     User(const User &)            = delete;
     User &operator=(const User &) = delete;
 
+    // [a-zA-Z]+, be paranoid for building file paths
+    static bool IsSafeUserName(const std::string &name);
+    
     void RegisterConnection(Server::ConnectionBase &connection);
     void DeregisterConnection(Server::ConnectionBase &connection);
-
+    
     template <class T>
     void Broadcast(const T &message)
     {
@@ -46,20 +48,15 @@ public:
     const bool Verify(const std::string &) const { return true; }
     const bool IsPrivileged() const { return true; }
 
-    Location &GetLocation() { return *m_here; }
-    void SetLocation(Location *location) { m_here = location; }
+    // Mud::World::World &World() { return m_world; }
 
-    Mud::World::World &World() { return m_world; }
-    
-    const std::vector<Noun *> &GetInventory() const { return m_inventory; }
-    void AddToInventory(Noun &item) { m_inventory.emplace_back(&item); }
+    const std::vector<Noun *> &GetInventory() const { return m_itemsHere; }
+    void AddToInventory(Noun &item) { m_itemsHere.emplace_back(&item); }
     void RemoveFromInventory(Noun &);
-    
+
 private:
     Mud::World::World &m_world;
-    Location *m_here;
     std::vector<Server::ConnectionBase *> m_connections;
-    std::vector<Noun *> m_inventory;
 };
 
 }

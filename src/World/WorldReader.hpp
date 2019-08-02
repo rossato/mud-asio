@@ -49,12 +49,6 @@ public:
           m_state(std::make_unique<NewRoomState>(*this))
     {}
 
-    ~WorldReader()
-    {
-        m_builder.NewUser("Ken", 1000);
-        m_builder.NewUser("Paul", 1001);
-    }
-
     void Read(std::istream &file);
 
     WorldBuilder &Builder() { return m_builder; }

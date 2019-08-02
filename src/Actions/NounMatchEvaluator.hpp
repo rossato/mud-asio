@@ -7,7 +7,7 @@
 
 namespace Mud
 {
-namespace Logic
+namespace Actions
 {
 
 extern const std::string CANT_SELF;
@@ -31,7 +31,7 @@ public:
         for (auto item : actor.GetInventory()) Evaluate(item);
     }
 
-    void EvaluateItemsInLocation(World::Location &location)
+    void EvaluateItemsInLocation(World::Noun &location)
     {
         for (auto item : location.GetItems()) Evaluate(item);
     }

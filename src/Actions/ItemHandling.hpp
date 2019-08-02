@@ -1,21 +1,20 @@
 #ifndef ITEM_HANDLING_HPP
 #define ITEM_HANDLING_HPP
 
-#include "BasicActions.hpp"
+#include "Grammar/BasicMatchers.hpp"
 
 namespace Mud
 {
-namespace Dictionary
+namespace Interface
 {
-class Tokenizer;
+class MudInterface;
 }
 namespace World
 {
 class Noun;
-class User;
 }
 
-namespace Logic
+namespace Actions
 {
 // Actions related to the movement of objects to/from players, locations etc
 
@@ -24,7 +23,9 @@ struct NounMatcher
     static std::string Description;
 
     typedef World::Noun* ValueType;
-    static ValueType Match(World::User &actor, Dictionary::Tokenizer &tok);
+    typedef Interface::MudInterface InterfaceType;
+
+    static ValueType Match(InterfaceType &interface);
 };
  
 struct HeldMatcher
@@ -32,7 +33,9 @@ struct HeldMatcher
     static std::string Description;
 
     typedef World::Noun* ValueType;
-    static ValueType Match(World::User &actor, Dictionary::Tokenizer &tok);
+    typedef Interface::MudInterface InterfaceType;
+
+    static ValueType Match(InterfaceType &interface);
 };
     
 struct LookAtAction
@@ -42,8 +45,9 @@ struct LookAtAction
 
     typedef NounMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response,
+    static void Act(InterfaceType &interface,
                     NounMatcher::ValueType noun, int);
 };
 
@@ -54,8 +58,9 @@ struct TakeAction
 
     typedef NounMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response,
+    static void Act(InterfaceType &interface,
                     NounMatcher::ValueType noun, int);
 };
 
@@ -66,8 +71,9 @@ struct DropAction
 
     typedef HeldMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response,
+    static void Act(InterfaceType &interface,
                     HeldMatcher::ValueType noun, int);
 };
     
@@ -78,8 +84,9 @@ struct InventoryAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response, int, int);
+    static void Act(InterfaceType &interface, int, int);
 };
 
 }

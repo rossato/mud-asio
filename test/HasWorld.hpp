@@ -1,35 +1,36 @@
 #ifndef WORLD_TEST_HPP
 #define WORLD_TEST_HPP
 
-#include "Dictionary/Tokenizer.hpp"
-#include "Logic/MudProgram.hpp"
-#include "HeadlessUser.hpp"
+#include "Program/MudProgram.hpp"
+#include "TestConnection.hpp"
+//#include "HeadlessUser.hpp"
 
 namespace Mud
 {
 namespace Test
 {
 
-Logic::MudProgram &theProgram();
+Program::MudProgram &theProgram();
     
 class ResetsWorld
 {
 protected:
     ResetsWorld()
-        : world(theProgram().World())
-        { world.TestInit(); }
-
-    World::World &world;
+    {
+        theProgram().World().TestInit();
+    }
 };
 
-class WorldTest : public ResetsWorld
+class HasWorld : public ResetsWorld
 {
 protected:
-    WorldTest()
-        : ken(world.GetUser("ken"))
+    HasWorld()
+        : world(theProgram().World()),
+          ken("ken")
         {}
 
-    HeadlessUser ken;
+    World::World &world;
+    TestInterface ken;
 };
     
 }

@@ -32,7 +32,7 @@ public:
     void Shutdown(int seconds);
 
     std::pair<int, int> GetNumberOfConnections() const;
-    
+
 private:
     void DoShutdown();
 
@@ -42,7 +42,7 @@ private:
     boost::asio::deadline_timer m_shutdownTimer;
     boost::asio::signal_set m_signal_set;
 };
-    
+
 }
 }
 

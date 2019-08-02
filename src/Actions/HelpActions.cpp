@@ -2,62 +2,63 @@
 
 #include <iomanip>
 #include "Grammar/Grammar.hpp"
+#include "Interface/MudInterface.hpp"
 #include "Server/Ansi.hpp"
-#include "World/User.hpp"
 #include "World/World.hpp"
 
 using namespace Mud;
-using namespace Mud::Logic;
+using namespace Mud::Actions;
     
 const std::string      HelpAction::Description("General help information");
 const std::string HelpAboutAction::Description("Information about the game");
 const std::string  HelpVerbAction::Description("Get usage for a particular verb");
 
-void HelpAction::Act(World::User &user, std::ostream &response, int, int)
+void HelpAction::Act(InterfaceType &interface, int, int)
 {
-    response << "For information about the game, try \"help about\"." NEWLINE NEWLINE;
-    response <<
+    interface <<
+        "For information about the game, try \"help about\"." NEWLINE NEWLINE
+              <<
         "For help with a specific command, try \"help <command>\"." NEWLINE
         "This is the list of known commands:" NEWLINE;
 
     int count = 0;
-    for (const auto &grammar : user.World().Grammar().GrammarIndex())
+    for (const auto &grammar : interface.Grammar().GrammarIndex())
     {
         if (++count > 7)
         {
-            response << NEWLINE;
+            interface.Write(NEWLINE);
             count -= 7;
         }
-        response << std::left << std::setw(10) << grammar.first;
+        interface << std::left << std::setw(10) << grammar.first;
     }
-    response << NEWLINE;
+    interface.Write(NEWLINE);
 }
 
-void HelpAboutAction::Act(World::User &, std::ostream &response, int, int)
+void HelpAboutAction::Act(Interface::MudInterface &interface, int, int)
 {
-    response <<
+    interface.Write(
         "mud-asio: C++11 MUD Project using the Boost ASIO library," NEWLINE
-        " Copyright 2018 Ken Rossato" NEWLINE;
+        " Copyright 2018 Ken Rossato" NEWLINE);
 }
 
-void HelpVerbAction::Act(World::User &user, std::ostream &response,
+void HelpVerbAction::Act(Interface::MudInterface &interface,
                          Grammar::VerbMatcher::ValueType verb, int)
 {
     if (*verb == "about")
     {
-        HelpAboutAction::Act(user, response, 0, 0);
+        HelpAboutAction::Act(interface, 0, 0);
         return;
     }
 
-    const auto &grammarIndex = user.World().Grammar().GrammarIndex();
+    const auto &grammarIndex = interface.Grammar().GrammarIndex();
     const auto verbHelp = grammarIndex.find(*verb);
 
     if (verbHelp == grammarIndex.end())
     {
-        response << "Help error: \"" << *verb << "\" is not a known command." NEWLINE;
+        interface << "Help error: \"" << *verb << "\" is not a known command." NEWLINE;
     }
     else
     {
-        response << verbHelp->second.help;
+        interface.Write(verbHelp->second.help);
     }
 }

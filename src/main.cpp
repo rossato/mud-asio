@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Logic/MudProgram.hpp"
+#include "Program/MudProgram.hpp"
 
 using namespace Mud;
 
@@ -13,7 +13,7 @@ int main()
 {
     std::cout << "Program starting..." << std::endl;
 
-    Logic::MudProgram program;
+    Program::MudProgram program;
     program.AcceptMudConnections(TELNET_SERVER_PORT);
     program.AcceptHttpConnections(HTTP_SERVER_PORT);
     program.Run();

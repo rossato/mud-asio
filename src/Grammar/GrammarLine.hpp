@@ -6,10 +6,6 @@
 
 namespace Mud
 {
-namespace World
-{
-class User;
-}
 namespace Grammar
 {
 
@@ -17,7 +13,7 @@ class GrammarLineBase
 {
 public:
     virtual ~GrammarLineBase() = default;
-    virtual bool TryParse(World::User &user, std::ostream &response, Dictionary::Tokenizer &tok) const = 0;
+    virtual bool TryParse(Dictionary::Tokenizer &tok) const = 0;
 
     template <class T>
     void EmplaceRule(T &&rule)
@@ -37,6 +33,9 @@ protected:
 // This class synthesizes multiple pluggable strategies
 //  into a single virtual parse call.
 //
+// Would love to use a function template instead of static-casts,
+//  but function templates and virtual functions don't mix.
+//
 template <class ActionType>
 class GrammarLine : public GrammarLineBase
 {
@@ -44,8 +43,7 @@ class GrammarLine : public GrammarLineBase
     typedef typename ActionType::IndirectMatcher IndirectMatcher;
 
 public:
-    virtual bool TryParse(World::User &user, std::ostream &response,
-                          Dictionary::Tokenizer &tok) const override
+    virtual bool TryParse(Dictionary::Tokenizer &tok) const override
     {
         typename DirectMatcher::ValueType direct;
         typename IndirectMatcher::ValueType indirect;
@@ -68,18 +66,28 @@ public:
                 continue;
 
             case TokenType::DIRECT:
-                if (!(direct = DirectMatcher::Match(user, tok))) return false;
+                if (!(direct = DirectMatcher::Match(
+                          static_cast<typename DirectMatcher::InterfaceType&>(tok)
+                          )))
+                {
+                    return false;
+                }
                 break;
 
             case TokenType::INDIRECT:
-                if (!(indirect = IndirectMatcher::Match(user, tok))) return false;
+                if (!(indirect = IndirectMatcher::Match(
+                          static_cast<typename IndirectMatcher::InterfaceType&>(tok)
+                          )))
+                {
+                    return false;
+                }
                 break;
             }
             ++rule;
         }
         if (tok) return false;
 
-        ActionType::Act(user, response, direct, indirect);
+        ActionType::Act(static_cast<typename ActionType::InterfaceType&>(tok), direct, indirect);
         return true;
     }
 

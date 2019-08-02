@@ -25,7 +25,7 @@ public:
 
     ~ReadingDescriptionState()
     {
-        m_reader.CurrentLocation().SetDescription(m_description.str());
+        m_reader.CurrentLocation().WithDescription(m_description.str());
     }
 
     virtual void HandleLine(std::istream &line) override

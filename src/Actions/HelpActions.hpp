@@ -6,12 +6,12 @@
 
 namespace Mud
 {
-namespace World
+namespace Interface
 {
-class User;
+class MudInterface;
 }
 
-namespace Logic
+namespace Actions
 {
 
 struct HelpAction
@@ -21,8 +21,9 @@ struct HelpAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
-
-    static void Act(World::User &, std::ostream &response, int, int);
+    typedef Interface::MudInterface InterfaceType;
+    
+    static void Act(InterfaceType &, int, int);
 };
 
 struct HelpAboutAction
@@ -32,8 +33,9 @@ struct HelpAboutAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &, std::ostream &response, int, int);
+    static void Act(InterfaceType &, int, int);
 };
 
 struct HelpVerbAction
@@ -43,8 +45,9 @@ struct HelpVerbAction
 
     typedef Grammar::VerbMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &, std::ostream &response,
+    static void Act(InterfaceType &,
                     Grammar::VerbMatcher::ValueType, int);
 };
 

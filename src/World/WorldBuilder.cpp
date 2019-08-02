@@ -1,21 +1,11 @@
 #include "WorldBuilder.hpp"
+
+#include "Dictionary/Dictionary.hpp"
 #include "World.hpp"
 
 using namespace Mud::World;
 
-WorldBuilder::~WorldBuilder()
-{
-    for (auto &location : m_world.m_locations)
-    {
-        for (const auto index : location.second.m_exitIndexes)
-        {
-            location.second.m_exits[index.first] = &m_world.GetLocation(index.second);
-        }
-        location.second.Repop();
-    }
-}
-    
-Location &WorldBuilder::NewLocation(int index, const std::string &name)
+Noun &WorldBuilder::NewLocation(int index, const std::string &name)
 {
     m_lastLocation =
         &(m_world.m_locations.emplace(
@@ -37,7 +27,9 @@ Noun &WorldBuilder::NewItem(const std::vector<std::string> &words)
                    {
                        return m_world.Dictionary().TryInsert(str, Dictionary::NOUN);
                    });
-    return m_lastLocation->EmplaceItem(words.front(), std::move(tokens));
+    auto &item = m_world.CreateNoun(words.front(), std::move(tokens));
+    m_lastLocation->AddItem(item);
+    return item;
 }
 
 User &WorldBuilder::NewUser(const std::string &name, int location)
@@ -45,8 +37,9 @@ User &WorldBuilder::NewUser(const std::string &name, int location)
     std::string downcased;
     std::transform(name.begin(), name.end(), std::back_inserter(downcased),
                    ::tolower);
-    return m_world.m_userDatabase.emplace(
+    return m_world.m_userCache.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(downcased),
         std::forward_as_tuple(m_world, name, m_world.GetLocation(location))).first->second;
 }
+

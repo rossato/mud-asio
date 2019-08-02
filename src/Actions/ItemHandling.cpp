@@ -1,5 +1,6 @@
 #include "ItemHandling.hpp"
 #include "Grammar/UsageException.hpp"
+#include "Interface/MudInterface.hpp"
 #include "Server/Ansi.hpp"
 #include "World/Location.hpp"
 #include "World/Noun.hpp"
@@ -7,7 +8,7 @@
 #include "NounMatchEvaluator.hpp"
 
 using namespace Mud;
-using namespace Mud::Logic;
+using namespace Mud::Actions;
 
 std::string NounMatcher::Description("<noun>");
 std::string HeldMatcher::Description("<held item>");
@@ -17,16 +18,18 @@ std::string      TakeAction::Description("Pick up an item in the current area");
 std::string      DropAction::Description("Put down an item that you have");
 std::string InventoryAction::Description("List the things that you have");
 
-NounMatcher::ValueType NounMatcher::Match(World::User &actor, Dictionary::Tokenizer &tok)
+NounMatcher::ValueType NounMatcher::Match(InterfaceType &interface)
 {   
-    NounMatchEvaluator nounEvaluator(tok);
+    NounMatchEvaluator nounEvaluator(interface);
 
+    auto &actor = interface.User();
+    
     if (nounEvaluator.IsSelf()) return &actor;
     if (!nounEvaluator.IsGrammatical()) return nullptr;
 
     nounEvaluator.EvaluateItemsInInventory(actor);
-    nounEvaluator.EvaluateItemsInLocation(actor.GetLocation());
-    nounEvaluator.EvaluateUsersInLocation(actor.GetLocation());
+    nounEvaluator.EvaluateItemsInLocation(*actor.GetLocation());
+    nounEvaluator.EvaluateUsersInLocation(*actor.GetLocation());
 
     auto candidate = nounEvaluator.BestCandidate();
     if (candidate) return candidate;
@@ -34,18 +37,19 @@ NounMatcher::ValueType NounMatcher::Match(World::User &actor, Dictionary::Tokeni
     nounEvaluator.ThrowMissingNounException();
 }
 
-HeldMatcher::ValueType HeldMatcher::Match(World::User &actor, Dictionary::Tokenizer &tok)
+HeldMatcher::ValueType HeldMatcher::Match(InterfaceType &interface)
 {
-    NounMatchEvaluator itemEvaluator(tok);
+    NounMatchEvaluator itemEvaluator(interface);
 
     if (!itemEvaluator.IsGrammatical()) return nullptr;
 
+    auto &actor = interface.User();
     itemEvaluator.EvaluateItemsInInventory(actor);
     
     auto candidate = itemEvaluator.BestCandidate();
     if (candidate) return candidate;
 
-    itemEvaluator.EvaluateItemsInLocation(actor.GetLocation());
+    itemEvaluator.EvaluateItemsInLocation(*actor.GetLocation());
 
     if (candidate = itemEvaluator.BestCandidate())
     {
@@ -56,7 +60,7 @@ HeldMatcher::ValueType HeldMatcher::Match(World::User &actor, Dictionary::Tokeni
         throw Grammar::UsageException(error.str());
     }
 
-    itemEvaluator.EvaluateUsersInLocation(actor.GetLocation());
+    itemEvaluator.EvaluateUsersInLocation(*actor.GetLocation());
 
     if (candidate = itemEvaluator.BestCandidate())
     {
@@ -70,73 +74,76 @@ HeldMatcher::ValueType HeldMatcher::Match(World::User &actor, Dictionary::Tokeni
 
     itemEvaluator.ThrowMissingNounException();
 }
-    
-void LookAtAction::Act(World::User &user, std::ostream &response,
+
+void LookAtAction::Act(InterfaceType &interface,
                        NounMatcher::ValueType noun, int)
 {
-    if (noun == &user)
+    if (noun == &interface.User())
     {
-        response << "You don't ";
+        interface.Write("You take a long hard look at yourself." NEWLINE);
     }
     else
     {
-        response << noun->TheName() << " doesn't ";
+        interface << noun->Description() << NEWLINE;
     }
-    response << "seem special to me." NEWLINE;
 }
     
-void TakeAction::Act(World::User &user, std::ostream &response,
+void TakeAction::Act(InterfaceType &interface,
                      NounMatcher::ValueType item, int)
 {
+    auto &user = interface.User();
     if (item == &user)
     {
-        response << CANT_SELF << NEWLINE;
+        interface << CANT_SELF << NEWLINE;
         return;
     }
     if (item->IsAUser())
     {
-        response << item->Name() << " wouldn't appreciate that very much." NEWLINE;
+        interface << item->Name() << " wouldn't appreciate that very much." NEWLINE;
         return;
     }
     
-    auto begin = user.GetLocation().GetItems().begin(),
-        end = user.GetLocation().GetItems().end();
+    auto begin = user.GetLocation()->GetItems().begin(),
+        end = user.GetLocation()->GetItems().end();
     
     if (std::find(begin, end, item) == end)
     {
-        response << "You already have " << item->theName() << "." NEWLINE;
+        interface << "You already have " << item->theName() << "." NEWLINE;
         return;
     }
 
+//    if (item->ReactToTake(user, interface.ostream())) return;
+
     user.AddToInventory(*item);
-    user.GetLocation().RemoveItem(*item);
+    user.GetLocation()->RemoveItem(*item);
 
     std::ostringstream out;
     out << user.Name() << " takes " << item->theName() << "." NEWLINE;
-    user.GetLocation().TellAllBut(user, out.str());
+    user.GetLocation()->TellAllBut(user, out.str());
 
-    response << "You take " << item->theName() << "." NEWLINE;
+    interface << "You take " << item->theName() << "." NEWLINE;
 }
 
-void DropAction::Act(World::User &user, std::ostream &response,
+void DropAction::Act(InterfaceType &interface,
                      HeldMatcher::ValueType item, int)
 {
-    user.GetLocation().AddItem(*item);
+    auto &user = interface.User();
+    user.GetLocation()->AddItem(*item);
     user.RemoveFromInventory(*item);
 
     std::ostringstream out;
     out << user.Name() << " drops " << item->aName() << " here." NEWLINE;
-    user.GetLocation().TellAllBut(user, out.str());
+    user.GetLocation()->TellAllBut(user, out.str());
 
-    response << "You drop " << item->theName() << "." NEWLINE;
+    interface << "You drop " << item->theName() << "." NEWLINE;
 }
 
-void InventoryAction::Act(World::User &user, std::ostream &response, int, int)
+void InventoryAction::Act(InterfaceType &interface, int, int)
 {
-    response << "You have the following items: " NEWLINE;
+    interface.Write("You have the following items: " NEWLINE);
 
-    for (auto item : user.GetInventory())
+    for (auto item : interface.User().GetInventory())
     {
-        response << "  " << item->aName() << NEWLINE;
+        interface << "  " << item->aName() << NEWLINE;
     }
 }

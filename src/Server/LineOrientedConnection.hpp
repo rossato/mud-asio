@@ -10,13 +10,12 @@ namespace Server
 {
     
 template <class InterfaceType>
-class LineOrientedConnection : public ConnectionBase {
+class LineOrientedConnection : public InterfaceType {
 public:
     template <class... Args>
-    LineOrientedConnection(SocketType &&socket, Args &&... args)
-        : ConnectionBase(std::move(socket)),
-          m_inputStream(&m_inputBuffer),
-          m_interface(*this, std::forward<Args>(args)...)
+    LineOrientedConnection(typename InterfaceType::SocketType &&socket, Args &&... args)
+        : InterfaceType(std::forward<Args>(args)..., std::move(socket)),
+          m_inputStream(&m_inputBuffer)
     {
         ReadLine();
     }
@@ -27,8 +26,6 @@ private:
     boost::asio::streambuf m_inputBuffer;
     std::istream m_inputStream;
     std::string m_line;
-
-    InterfaceType m_interface;
 };
 
 }

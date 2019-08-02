@@ -9,6 +9,24 @@ namespace Mud
 namespace World
 {
 
+// void Location::Repop()
+// {
+//     m_itemsHere.clear();
+//     for (auto &item : m_itemRepops)
+//     {
+//         m_itemsHere.emplace_back(&item);
+//     }
+// }
+
+Location &Location::TellAllBut(User &actor, const std::string &message)
+{
+    for (auto user : m_usersHere)
+    {
+        if (user != &actor) user->Broadcast(message);
+    }
+    return *this;
+}
+
 void Location::UserArriving(User &user)
 {
     std::ostringstream out;
@@ -46,25 +64,6 @@ void Location::UserLeaving(User &user, Direction dir)
         *userIt = *(end-1);
         m_usersHere.pop_back();
     }
-}
-
-void Location::RemoveItem(Noun &item)
-{
-    auto end = m_itemsHere.end(),
-        pos = std::find(m_itemsHere.begin(),
-                        end, &item);
-
-    if (pos != end)
-    {
-        *pos = *(end-1);
-        m_itemsHere.pop_back();
-    }
-}
-
-std::ostream &operator<<(std::ostream &stream, const Location &location)
-{
-    return stream << BOLDTEXT << location.m_name << PLAINTEXT NEWLINE
-                  << location.m_description << NEWLINE;
 }
 
 }

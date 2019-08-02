@@ -5,7 +5,7 @@
 
 namespace Mud
 {
-namespace Logic
+namespace Actions
 {
 
 const std::string CANT_SELF("That's not an action you can participate in.");

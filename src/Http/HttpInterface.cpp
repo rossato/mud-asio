@@ -4,7 +4,6 @@
 #include <iomanip>
 #include <sstream>
 #include "Server/Ansi.hpp"
-#include "Server/CloseException.hpp"
 #include "Server/ConnectionBase.hpp"
 #include "Server/Server.hpp"
 
@@ -74,13 +73,13 @@ void HttpInterface::ExecuteRequest()
     }
 
     auto time = std::time(nullptr);
-    m_connection << "HTTP/1.1 " << status << " " << response << NEWLINE
-                 << "Date: "
-                 // "Thu, 18 Oct 2018 13:44:35 GMT" format per RFC 2616
-                 << std::put_time(std::gmtime(&time), "%a, %d %b %Y %T %Z")
-                 << NEWLINE
-                 << "Server: mud-asio/1.0" NEWLINE
-                 << "Connection: close" NEWLINE;
+    *this << "HTTP/1.1 " << status << " " << response << NEWLINE
+          << "Date: "
+        // "Thu, 18 Oct 2018 13:44:35 GMT" format per RFC 2616
+          << std::put_time(std::gmtime(&time), "%a, %d %b %Y %T %Z")
+          << NEWLINE
+          << "Server: mud-asio/1.0" NEWLINE
+          << "Connection: close" NEWLINE;
 
     if (status == 200)
     {
@@ -96,19 +95,19 @@ void HttpInterface::ExecuteRequest()
         
         std::string content = contentStream.str();
 
-        m_connection << "Content-Type: application/json" NEWLINE
-                     << "Content-Length: " << content.size() << NEWLINE
-                     << NEWLINE;
+        *this << "Content-Type: application/json" NEWLINE
+              << "Content-Length: " << content.size() << NEWLINE
+              << NEWLINE;
 
         if (m_method == "GET")
         {
-            m_connection << content;
+            *this << content;
         }
     }
     else
     {
-        m_connection << NEWLINE;
+        *this << NEWLINE;
     }
-    
-    throw Server::CloseException();
+
+    Close("HTTP response completed");
 }

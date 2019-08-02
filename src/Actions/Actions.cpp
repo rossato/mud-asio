@@ -1,4 +1,4 @@
-#include "Logic.hpp"
+#include "Actions.hpp"
 #include "Grammar/GrammarBuilder.hpp"
 #include "AdminActions.hpp"
 #include "BasicActions.hpp"
@@ -6,14 +6,14 @@
 #include "ItemHandling.hpp"
 
 using namespace Mud::Grammar;
-using namespace Mud::Logic;
+using namespace Mud::Actions;
 
 namespace Mud
 {
-namespace Logic
+namespace Actions
 {
 
-void PopulateGrammarWithLogic(Grammar::Grammar &grammar, Dictionary::Dictionary &dictionary)
+void PopulateGrammarWithActions(Grammar::Grammar &grammar, Dictionary::Dictionary &dictionary)
 {
     std::cout << "Initializing rules of grammar..." << std::endl;
     GrammarBuilder builder(grammar, dictionary);
@@ -37,6 +37,9 @@ void PopulateGrammarWithLogic(Grammar::Grammar &grammar, Dictionary::Dictionary 
     builder.NewGrammarLine<ShutdownCancelAction>()
         .OneOf({"abort", "cancel"});
 
+    builder.NewVerb("debug");
+    builder.NewGrammarLine<DebugAction>();
+    
     // BasicActions.hpp
 
     builder.NewVerb("quit");
@@ -53,7 +56,7 @@ void PopulateGrammarWithLogic(Grammar::Grammar &grammar, Dictionary::Dictionary 
         .DirectObject();
 
     builder.NewVerb("go");
-    builder.NewGrammarLine<GoAction>(SuppressHelp); // Encourage the user to specify a dir.
+    builder.NewGrammarLine<GoNowhereAction>(); // Encourage the user to specify a dir.
     builder.NewGrammarLine<GoAction>()
         .DirectObject();
 

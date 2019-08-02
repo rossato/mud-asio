@@ -1,56 +1,55 @@
 #include <gtest/gtest.h>
-#include "Logic/BasicActions.hpp"
+#include "Actions/BasicActions.hpp"
 #include "HasWorld.hpp"
-#include "HeadlessUser.hpp"
 
 namespace Mud
 {
 namespace Test
 {
 
-class SayTest : public ::testing::Test, public WorldTest
+class SayTest : public ::testing::Test, public HasWorld
 {
 };
 
+using namespace Mud::Actions;
 using namespace Mud::Grammar;
-using namespace Mud::Logic;
-    
+
 TEST_F(SayTest, DumpSayAction)
 {
     RestOfLineMatcher::ValueType value("hello");
-    SayAction::Act(ken, ken.connection.output, value, 0);
-    std::cout << ken.connection.output.str() << std::endl;
+    SayAction::Act(ken, value, 0);
+    std::cout << ken.output.str() << std::endl;
 
-    EXPECT_NE(ken.connection.output.str().find("You say"), std::string::npos);
-    EXPECT_NE(ken.connection.output.str().find("hello"), std::string::npos);
+    EXPECT_NE(ken.output.str().find("You say"), std::string::npos);
+    EXPECT_NE(ken.output.str().find("hello"), std::string::npos);
 }
 
 TEST_F(SayTest, DumpSayActionObserved)
 {
-    HeadlessUser paul(world.GetUser("paul"));
-    paul.RunCommand("w");
+    TestInterface paul("paul");
+    paul.HandleLine("w");
 
-    ken.connection.output.str("");
+    ken.output.str("");
     RestOfLineMatcher::ValueType value("hello");
-    SayAction::Act(paul, paul.connection.output, value, 0);
+    SayAction::Act(paul, value, 0);
 
-    std::cout << ken.connection.output.str() << std::endl;
+    std::cout << ken.output.str() << std::endl;
 
-    EXPECT_NE(ken.connection.output.str().find("Paul says"), std::string::npos);
-    EXPECT_NE(ken.connection.output.str().find("hello"), std::string::npos);
+    EXPECT_NE(ken.output.str().find("Paul says"), std::string::npos);
+    EXPECT_NE(ken.output.str().find("hello"), std::string::npos);
 }
 
 TEST_F(SayTest, Parse)
 {
-    ken.RunCommand("say Hello, everyone!");
-    EXPECT_NE(ken.connection.output.str().find("You say"), std::string::npos);
-    EXPECT_NE(ken.connection.output.str().find("Hello, everyone!"), std::string::npos);
+    ken.HandleLine("say Hello, everyone!");
+    EXPECT_NE(ken.output.str().find("You say"), std::string::npos);
+    EXPECT_NE(ken.output.str().find("Hello, everyone!"), std::string::npos);
 }
 
 TEST_F(SayTest, ParseBlankLine)
 {
-    ken.RunCommand("say");
-    EXPECT_NE(ken.connection.output.str().find("Say what?"), std::string::npos);
+    ken.HandleLine("say");
+    EXPECT_NE(ken.output.str().find("Say what?"), std::string::npos);
 }
 
 }

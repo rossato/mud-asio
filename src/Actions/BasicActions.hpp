@@ -2,17 +2,20 @@
 #define BASIC_ACTIONS_HPP
 
 #include "Grammar/BasicMatchers.hpp"
-#include "Server/CloseException.hpp"
 #include "World/Direction.hpp"
 
 namespace Mud
 {
+namespace Interface
+{
+class MudInterface;
+}
 namespace World
 {
 class User;
 }
 
-namespace Logic
+namespace Actions
 {
 
 struct QuitAction
@@ -22,8 +25,9 @@ struct QuitAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    [[ noreturn ]] static void Act(World::User &, std::ostream &response, int, int);
+    static void Act(InterfaceType &interface, int, int);
 };
 
 struct LookAction
@@ -33,8 +37,9 @@ struct LookAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &, std::ostream &response, int, int);
+    static void Act(InterfaceType &interface, int, int);
 };
 
 struct SayAction
@@ -44,8 +49,9 @@ struct SayAction
 
     typedef Grammar::RestOfLineMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &, std::ostream &response, Grammar::RestOfLineMatcher::ValueType &line, int);
+    static void Act(InterfaceType &interface, Grammar::RestOfLineMatcher::ValueType &line, int);
 };
 
 struct DirectionMatcher
@@ -53,8 +59,9 @@ struct DirectionMatcher
     static const std::string Description;
     
     typedef World::Direction ValueType;
-
-    static ValueType Match(World::User &, Dictionary::Tokenizer &tok)
+    typedef Dictionary::Tokenizer InterfaceType;
+    
+    static ValueType Match(InterfaceType &tok)
     {
         return World::TokenToDirection(tok.GetToken());
     }
@@ -67,8 +74,24 @@ struct GoAction
 
     typedef DirectionMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &, std::ostream &response, DirectionMatcher::ValueType dir, int);
+    static void Act(InterfaceType &interface, DirectionMatcher::ValueType dir, int);
+};
+
+struct GoNowhereAction
+{
+    static const std::string Description;
+    static const bool RequiresPrivilege = false;
+
+    typedef Grammar::NoneMatcher DirectMatcher;
+    typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
+
+    static void Act(InterfaceType &interface, int, int)
+    {
+        GoAction::Act(interface, World::NODIR, 0);
+    }
 };
 
 template <World::Direction dir>
@@ -79,10 +102,11 @@ struct GoDirAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response, int, int)
+    static void Act(InterfaceType &interface, int, int)
     {
-        GoAction::Act(user, response, dir, 0);
+        GoAction::Act(interface, dir, 0);
     }
 };
 

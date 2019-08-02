@@ -4,30 +4,33 @@
 #include <map>
 #include <string>
 
+#include "Server/ConnectionBase.hpp"
+
 namespace Mud
 {
 namespace Server
 {
-    class ConnectionBase;
-    class Server;
+class Server;
 }
 
 namespace Http
 {
     
-class HttpInterface
+class HttpInterface : public Server::ConnectionBase
 {
 public:
-    HttpInterface(Server::ConnectionBase &connection, Server::Server &server)
-        : m_connection(connection), m_server(server)
+    template <class... Args>
+    HttpInterface(Server::Server &server, Args &&... args)
+        : Server::ConnectionBase(std::forward<Args>(args)...),
+          m_server(server)
     {}
 
     void HandleLine(const std::string &line);
-
+    void HandleClose() {}
+    
 private:
-    [[ noreturn ]] void ExecuteRequest();
+    void ExecuteRequest();
 
-    Server::ConnectionBase &m_connection;
     Server::Server &m_server;
     std::map<std::string, std::string> m_requestHeaders;
     std::string m_method, m_url, m_version;

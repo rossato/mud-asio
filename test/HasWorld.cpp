@@ -5,9 +5,9 @@ namespace Mud
 namespace Test
 {
 
-Logic::MudProgram &theProgram()
+Program::MudProgram &theProgram()
 {
-    static Logic::MudProgram program;
+    static Program::MudProgram program;
     return program;
 }
     

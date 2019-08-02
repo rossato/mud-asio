@@ -2,13 +2,14 @@
 #define ADMIN_VERBS_HPP
 
 #include "Grammar/BasicMatchers.hpp"
+#include "Interface/MudInterface.hpp"
 #include "Server/Ansi.hpp"
 #include "Server/Server.hpp"
 #include "World/World.hpp"
 
 namespace Mud
 {
-namespace Logic
+namespace Actions
 {
 
 struct ShutdownAction
@@ -18,21 +19,22 @@ struct ShutdownAction
 
     typedef Grammar::NumberMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response, DirectMatcher::ValueType seconds, int)
+    static void Act(InterfaceType &interface, DirectMatcher::ValueType seconds, int)
     {
         // todo call world cleanup
         // todo permission checking
-        std::cout << "Server received request from " << user.Name() << " to shut down in "
+        std::cout << "Server received request from " << interface.User().Name() << " to shut down in "
                   << *seconds << " seconds." NEWLINE;
-        response << "Server will shut down in " << *seconds << " seconds." NEWLINE;
+        interface << "Server will shut down in " << *seconds << " seconds." NEWLINE;
 
 //  This functionality requires a list of currently logged in users.
 //  I don't want to do this through the Server connection pool because
 //  that may be serving connections of different protocols.
 //        user.World().Broadcast("Alert message");
         
-        user.World().Server().Shutdown(*seconds);
+        interface.Server().Shutdown(*seconds);
     }
 };
 
@@ -43,12 +45,14 @@ struct ShutdownHelpAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response, int, int)
+    static void Act(InterfaceType &interface, int, int)
     {
-        response <<
+        interface.Write(
             "When would you like to shutdown the server?" NEWLINE
-            "(enter \"shutdown now\" to shutdown now, or \"help shutdown\" for more options)" NEWLINE;
+            "(enter \"shutdown now\" to shutdown now, or \"help shutdown\" for more options)" NEWLINE
+            );
     }
 };
 
@@ -59,10 +63,11 @@ struct ShutdownNowAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response, int, int)
+    static void Act(InterfaceType &interface, int, int)
     {
-        ShutdownAction::Act(user, response, 0, 0);
+        ShutdownAction::Act(interface, 0, 0);
     }
 };
 
@@ -73,16 +78,29 @@ struct ShutdownCancelAction
 
     typedef Grammar::NoneMatcher DirectMatcher;
     typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
 
-    static void Act(World::User &user, std::ostream &response, int, int)
+    static void Act(InterfaceType &interface, int, int)
     {
-        std::cout << "Server received request from " << user.Name() << " to cancel shut down." NEWLINE;
+        std::cout << "Server received request from " << interface.User().Name() << " to cancel shut down." NEWLINE;
 
-        user.World().Server().CancelShutdown();
-        response << "Server shutdown cancelled." NEWLINE;
+        interface.Server().CancelShutdown();
+        interface.Write("Server shutdown cancelled." NEWLINE);
     }
 };
 
+struct DebugAction
+{
+    static const std::string Description;
+    static const bool RequiresPrivilege = true;
+
+    typedef Grammar::NoneMatcher DirectMatcher;
+    typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Interface::MudInterface InterfaceType;
+
+    static void Act(InterfaceType &interface, int, int);
+};
+    
 }
 }
 

@@ -11,38 +11,28 @@ namespace Mud
 namespace Grammar
 {
 
-void Grammar::Parse(World::User &speaker, std::ostream &response, Dictionary::Tokenizer &tok) const
+void Grammar::Parse(Dictionary::Tokenizer &tok) const
 {
     const auto &verb = tok.GetString();
     GrammarIndexType::const_iterator verb_grammars = m_grammarIndex.find(verb);
     if (verb_grammars == m_grammarIndex.end())
     {
-        response << "Parser error: \"" << verb
-                 << "\" is not a known command." NEWLINE;
-        return;
+        std::ostringstream out;
+        out << "\"" << verb << "\" is not a known command." NEWLINE;
+        throw UsageException(out.str());
     }
     
-    try
-    {
-        GrammarListType::const_iterator
-            grammar = m_grammars.begin() + verb_grammars->second.begin,
-            end     = m_grammars.begin() + verb_grammars->second.end;
+    GrammarListType::const_iterator
+        grammar = m_grammars.begin() + verb_grammars->second.begin,
+        end     = m_grammars.begin() + verb_grammars->second.end;
 
-        for (; grammar != end; ++grammar, tok.Seek(1))
-        {
-            if ((*grammar)->TryParse(speaker, response, tok)) return;
-        }
-        response << "Parser error: I didn't understand the usage of that command, try \"help "
-                 << verb << "\"." NEWLINE;
-    }
-    catch (const Dictionary::WordNotFoundException& e)
+    for (; grammar != end; ++grammar, tok.Seek(1))
     {
-        response << "Parser error: I don't know what the word \"" << e.word() << "\" means." NEWLINE;
+        if ((*grammar)->TryParse(tok)) return;
     }
-    catch (const UsageException &e)
-    {
-        response << "Parser error: " << e.what() << NEWLINE;
-    }
+    std::ostringstream out;
+    out << "I didn't understand the usage of that command, try \"help " << verb << "\"." NEWLINE;
+    throw UsageException(out.str());
 }
 
 }

@@ -1,5 +1,4 @@
 #include <iostream>
-#include "CloseException.hpp"
 
 namespace Mud
 {
@@ -9,29 +8,26 @@ namespace Server
 template<class InterfaceType>
 void LineOrientedConnection<InterfaceType>::ReadLine()
 {
-    async_read_until(m_socket, m_inputBuffer, '\n',
+    async_read_until(this->m_socket, m_inputBuffer, '\n',
     [this](boost::system::error_code error, std::size_t)
     {
         if (error)
         {
-            std::cout << "async_read_until returned with error." << std::endl;
+            if (error != boost::asio::error::eof)
+            {
+                std::cout << "async_read_until returned with error: " << error << std::endl;
+            }
+
+            this->HandleClose();
+            this->DoneReading();
         }
         else
         {
-            try
-            {
-                std::getline(m_inputStream, m_line);
-                m_interface.HandleLine(m_line);
+            std::getline(m_inputStream, m_line);
+            this->HandleLine(m_line);
 
-                ReadLine();
-                return;
-            }
-            catch (const CloseException &)
-            {
-                std::cout << "Gracefully closing connection due to program logic." << std::endl;
-            }
+            ReadLine();
         }
-        DoneReading();
     });
 }
 

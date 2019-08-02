@@ -4,11 +4,19 @@
 #include <sstream>
 #include <boost/asio.hpp>
 #include <gtest/gtest.h>
+#include "Interface/MudInterface.hpp"
 #include "Server/ConnectionBase.hpp"
-#include "Logic/MudInterface.hpp"
 
 namespace Mud
 {
+namespace Grammar
+{
+class Grammar;
+}
+namespace Server
+{
+class Server;
+}
 namespace World
 {
 class World;
@@ -33,23 +41,25 @@ public:
         : Mud::Server::ConnectionBase(m_io_service, output) {}
 };
 
-class TestConnectionWithInterface : public TestConnection
+class TestInterface : public TestConnectionBase, public Mud::Interface::MudInterface
 {
 public:
-    TestConnectionWithInterface(World::World &world)
-        : mud(*this, world) {}
+    TestInterface();
 
-    TestConnectionWithInterface(World::World &world, const std::string &name)
-        : TestConnectionWithInterface(world)
+    TestInterface(const std::string &name)
+        : TestInterface()
     {
-        mud.HandleLine(name);
-        mud.HandleLine("p");
+        HandleLine(name);
+        HandleLine("password");
 
         EXPECT_NE(output.str().find("> "), std::string::npos);
         output.str("");
     }
-    
-    Mud::Logic::MudInterface mud;
+
+    ~TestInterface()
+    {
+        HandleClose();
+    }
 };
 
 }
