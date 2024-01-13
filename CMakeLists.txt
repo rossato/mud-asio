@@ -3,6 +3,8 @@ project(mud)
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
   set(CMAKE_BUILD_TYPE "Debug")
+elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(Boost_USE_STATIC_LIBS "true")    
 endif()
 
 find_package( Boost COMPONENTS system REQUIRED )
