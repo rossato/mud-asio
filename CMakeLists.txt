@@ -77,4 +77,7 @@ add_executable(mudtest ${TEST_SRCS})
 target_link_libraries(mudtest mudlib ${Boost_LIBRARIES} ${LUA_LDFLAGS} ${CMAKE_THREAD_LIBS_INIT} ${GTEST_BOTH_LIBRARIES})
 add_custom_target(check DEPENDS mudtest COMMAND mudtest)
 add_custom_target(dump DEPENDS mudtest COMMAND mudtest --gtest_filter="*Dump*" > dump.txt)
-doxygen_add_docs(doc)
+
+if (DOXYGEN_FOUND)
+  doxygen_add_docs(doc)
+endif()
