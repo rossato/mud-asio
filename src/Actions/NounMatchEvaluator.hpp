@@ -26,6 +26,11 @@ public:
 
     void Evaluate(World::Noun *noun);
 
+    template<typename iterator_type> void Evaluate(iterator_type start, iterator_type end)
+    {
+        for (; start != end; ++start) Evaluate(*start);
+    }
+    
     void EvaluateItemsInInventory(World::User &actor)
     {
         for (auto item : actor.GetInventory()) Evaluate(item);

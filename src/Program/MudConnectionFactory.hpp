@@ -6,21 +6,10 @@
 
 namespace Mud
 {
-namespace Grammar
-{
-    class Grammar;
-}
-namespace Server
-{
-    class Server;
-}
-namespace World
-{
-    class World;
-}
-
 namespace Program
 {
+
+class MudProgram;
 
 class MudConnectionFactory
 {
@@ -28,20 +17,18 @@ public:
     typedef Server::LineOrientedConnection<Interface::MudInterface> ConnectionType;
     static const std::string ConnectionTypeDescription; // "mud telnet"
 
-    MudConnectionFactory(Grammar::Grammar &grammar, Server::Server &server, World::World &world)
-        : m_grammar(grammar), m_server(server), m_world(world)
+    MudConnectionFactory(MudProgram &program)
+        : m_program(program)
     {}
     
     template <class ConnectionPoolType>
     void CreateConnection(ConnectionPoolType &pool, ConnectionType::SocketType &&socket)
     {
-        pool.EmplaceConnection(std::move(socket), m_grammar, m_server, m_world);
+        pool.EmplaceConnection(std::move(socket), m_program);
     }
 
 private:
-    Grammar::Grammar &m_grammar;
-    Server::Server &m_server;
-    World::World &m_world;
+    MudProgram &m_program;
 };
 
 }

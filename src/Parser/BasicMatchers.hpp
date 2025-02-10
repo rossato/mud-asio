@@ -7,7 +7,7 @@
 
 namespace Mud
 {
-namespace Grammar
+namespace Parser
 {
     
 struct NoneMatcher
@@ -15,9 +15,9 @@ struct NoneMatcher
     static const std::string Description;
 
     typedef int ValueType;
-    typedef Dictionary::Tokenizer InterfaceType;
-    
-    static constexpr ValueType Match(InterfaceType &) {return 0;}
+
+    template <class ContextType>
+    static constexpr ValueType Match(ContextType &, Dictionary::Tokenizer &) {return 0;}
 };
 
 struct NumberMatcher
@@ -25,9 +25,9 @@ struct NumberMatcher
     static const std::string Description;
 
     typedef std::optional<int> ValueType;
-    typedef Dictionary::Tokenizer InterfaceType;
 
-    static ValueType Match(InterfaceType &tok)
+    template <class ContextType>
+    static ValueType Match(ContextType &, Dictionary::Tokenizer &tokenizer)
     {
         // Dictionary::Token token = tok.GetNextToken();
 
@@ -38,7 +38,7 @@ struct NumberMatcher
 
         try
         {
-            return std::stoi(tok.GetString());
+            return std::stoi(tokenizer.GetString());
         }
         catch(const std::exception &)
         {
@@ -52,11 +52,11 @@ struct VerbMatcher
     static const std::string Description;
     
     typedef const std::string* ValueType;
-    typedef Dictionary::Tokenizer InterfaceType;
 
-    static ValueType Match(InterfaceType &tok)
+    template <class ContextType>
+    static ValueType Match(ContextType &, Dictionary::Tokenizer &tokenizer)
     {
-        auto &verb = tok.GetString();
+        auto &verb = tokenizer.GetString();
         if (verb.empty()) return nullptr;
         return &verb;
     }
@@ -67,11 +67,11 @@ struct RestOfLineMatcher
     static const std::string Description;
 
     typedef std::optional<std::string> ValueType;
-    typedef Dictionary::Tokenizer InterfaceType;
 
-    static ValueType Match(InterfaceType &tok)
+    template <class ContextType>
+    static ValueType Match(ContextType &, Dictionary::Tokenizer &tokenizer)
     {
-        return tok.DumpRestOfLine();
+        return tokenizer.DumpRestOfLine();
     }
 };
 

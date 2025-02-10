@@ -1,7 +1,7 @@
 #ifndef ITEM_HANDLING_HPP
 #define ITEM_HANDLING_HPP
 
-#include "Grammar/BasicMatchers.hpp"
+#include "Parser/BasicMatchers.hpp"
 
 namespace Mud
 {
@@ -23,9 +23,8 @@ struct NounMatcher
     static std::string Description;
 
     typedef World::Noun* ValueType;
-    typedef Interface::MudInterface InterfaceType;
 
-    static ValueType Match(InterfaceType &interface);
+    static ValueType Match(Interface::MudInterface &interface, Dictionary::Tokenizer &tokenizer);
 };
  
 struct HeldMatcher
@@ -33,9 +32,8 @@ struct HeldMatcher
     static std::string Description;
 
     typedef World::Noun* ValueType;
-    typedef Interface::MudInterface InterfaceType;
 
-    static ValueType Match(InterfaceType &interface);
+    static ValueType Match(Interface::MudInterface &interface, Dictionary::Tokenizer &tokenizer);
 };
     
 struct LookAtAction
@@ -44,11 +42,9 @@ struct LookAtAction
     static const bool RequiresPrivilege = false;
 
     typedef NounMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &interface,
-                    NounMatcher::ValueType noun, int);
+    static void Act(Interface::MudInterface &interface, NounMatcher::ValueType noun);
 };
 
 struct TakeAction
@@ -57,11 +53,9 @@ struct TakeAction
     static const bool RequiresPrivilege = false;
 
     typedef NounMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &interface,
-                    NounMatcher::ValueType noun, int);
+    static void Act(Interface::MudInterface &interface, NounMatcher::ValueType noun);
 };
 
 struct DropAction
@@ -70,11 +64,9 @@ struct DropAction
     static const bool RequiresPrivilege = false;
 
     typedef HeldMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &interface,
-                    HeldMatcher::ValueType noun, int);
+    static void Act(Interface::MudInterface &interface, HeldMatcher::ValueType noun);
 };
     
 struct InventoryAction
@@ -82,11 +74,10 @@ struct InventoryAction
     static std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &interface, int, int);
+    static void Act(Interface::MudInterface &interface);
 };
 
 }

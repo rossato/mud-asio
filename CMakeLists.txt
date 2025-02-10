@@ -18,7 +18,7 @@ pkg_check_modules( LUA REQUIRED lua )
 include_directories( ${Boost_INCLUDE_DIR} . )
 
 set(CMAKE_CXX_STANDARD 17)
-add_compile_options(-Wreturn-type -Wreorder)
+add_compile_options(-Wall -Werror=return-type -Werror=reorder)
 
 include_directories(src)
 set(SRCS
@@ -30,9 +30,6 @@ set(SRCS
   src/Actions/NounMatchEvaluator.cpp
   src/Dictionary/Dictionary.cpp
   src/Dictionary/Tokenizer.cpp
-  src/Grammar/BasicMatchers.cpp
-  src/Grammar/Grammar.cpp
-  src/Grammar/GrammarBuilder.cpp
   src/Http/HttpConnectionFactory.cpp
   src/Http/HttpInterface.cpp
   src/Interface/HandleLoginState.cpp
@@ -40,7 +37,9 @@ set(SRCS
   src/Interface/LuaState.cpp
   src/Interface/MudInterface.cpp
   src/Interface/ParsingGrammarState.cpp
+  src/Parser/BasicMatchers.cpp
   src/Program/MudConnectionFactory.cpp
+  src/Program/MudProgram.cpp
   src/Server/ConnectionBase.cpp
   src/Server/Server.cpp
   src/World/Direction.cpp

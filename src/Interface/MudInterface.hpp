@@ -3,15 +3,16 @@
 
 #include <string>
 #include "Dictionary/Tokenizer.hpp"
+#include "Program/MudProgram.hpp"
 #include "Server/ConnectionBase.hpp"
-#include "World/World.hpp"
 #include "InterfaceStateBase.hpp"
+#include "MudParser.hpp"
 
 namespace Mud
 {
 namespace Grammar
 {
-class Grammar;
+template <class ContextType> class Parser;
 }
 
 namespace Server
@@ -22,28 +23,27 @@ class Server;
 namespace World
 {
 class User;
+class World;
 }
 
 namespace Interface
 {
 
-class MudInterface : public Server::ConnectionBase, public Dictionary::Tokenizer {
+class MudInterface : public Server::ConnectionBase {
 public:
     template <class... Args>
-    MudInterface(Grammar::Grammar &grammar, Server::Server &server, World::World &world,
+    MudInterface(Program::MudProgram &program,
                  Args &&... args)
         : Server::ConnectionBase(std::forward<Args>(args)...),
-          Dictionary::Tokenizer(world.Dictionary()),
-          m_grammar(grammar),
-          m_server(server),
-          m_world(world)
+          m_tokenizer(program.Dictionary()),
+          m_program(program)
     {
         Welcome();
     }
 
     void HandleLine(const std::string &line)
     {
-        Str(line);
+        m_tokenizer.Str(line);
         m_state->HandleLine();
         m_state->Prompt();
     }
@@ -52,9 +52,10 @@ public:
     void SetUser(World::User &user) { m_user = &user; }
     World::User &User() const { return *m_user; }
 
-    Grammar::Grammar &Grammar() const { return m_grammar; }
-    Server::Server   &Server()  const { return m_server; }
-    World::World     &World()   const { return m_world; }
+    Dictionary::Tokenizer &Tokenizer()       { return m_tokenizer; }
+    MudParser             &Parser()    const { return m_program.Parser(); }
+    Server::Server        &Server()    const { return m_program.Server(); }
+    World::World          &World()     const { return m_program.World();  }
     
     template <class StateType>
     void ChangeState()
@@ -66,9 +67,8 @@ private:
     void Welcome();
 
     World::User *m_user;
-    Grammar::Grammar &m_grammar;
-    Server::Server &m_server;
-    World::World &m_world;
+    Dictionary::Tokenizer m_tokenizer;
+    Program::MudProgram &m_program;
     
     std::unique_ptr<InterfaceStateBase> m_state;
 };

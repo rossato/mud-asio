@@ -1,52 +1,59 @@
 #ifndef MUD_PROGRAM_HPP
 #define MUD_PROGRAM_HPP
 
-#include "Actions/Actions.hpp"
-#include "Grammar/Grammar.hpp"
-#include "Http/HttpConnectionFactory.hpp"
-#include "Server/Server.hpp"
-#include "World/World.hpp"
-#include "MudConnectionFactory.hpp"
+#include <memory>
+#include "Interface/MudParser.hpp"
 
 namespace Mud
 {
+namespace Dictionary
+{
+class Dictionary;
+}
+namespace Server
+{
+class Server;
+}
+namespace World
+{
+class World;
+}
+
 namespace Program
 {
 
+// This class holds onto 4 global objects that may need to be accessed.
+// Let's use PIMPL to hide the complete types since not everyone needs all type definitions.
+
+// This does have the downside of adding a layer of indirection (references instead of actual object locations)
+//  But this is irrelevant if consumers hold the reference themselves regardless.
+//  It matters only if consumers come all the way back here via inlines to get references.
+
+class MudProgramImpl;
+    
 class MudProgram
 {
 public:
-    MudProgram()
-        : m_world(m_dictionary),
-          m_mudFactory(m_grammar, m_server, m_world),
-          m_httpFactory(m_server)
-    {
-        Actions::PopulateGrammarWithActions(m_grammar, m_dictionary);
-    }
+    MudProgram();
+    ~MudProgram();
 
-    void AcceptMudConnections(int port)
-    {
-        m_server.Accept(port, m_mudFactory);
-    }
+    void AcceptMudConnections(int port);
+    void AcceptHttpConnections(int port);
+    
+    void Run();
 
-    void AcceptHttpConnections(int port)
-    {
-        m_server.Accept(port, m_httpFactory);
-    }
-    
-    void Run() { m_server.Run(); }
-    
+    Dictionary::Dictionary &Dictionary() { return m_dictionary; }
     World::World &World() { return m_world; }
-    Grammar::Grammar &Grammar() { return m_grammar; }
+    Interface::MudParser &Parser() { return m_parser; }
     Server::Server &Server() { return m_server; }
     
 private:
-    Dictionary::Dictionary m_dictionary;
-    World::World m_world;
-    Grammar::Grammar m_grammar;
-    Server::Server m_server;
-    MudConnectionFactory m_mudFactory;
-    Http::HttpConnectionFactory m_httpFactory;
+    std::unique_ptr<MudProgramImpl> m_impl;
+
+    Dictionary::Dictionary &m_dictionary;
+    World::World &m_world;
+    Interface::MudParser &m_parser;
+    Server::Server &m_server;
 };
 
 }

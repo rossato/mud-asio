@@ -3,11 +3,12 @@
 
 namespace Mud
 {
-namespace Grammar
+namespace Parser
 {
 struct SuppressHelp_t SuppressHelp;
-    
-void GrammarBuilder::NewVerb(std::vector<std::string> &&verbs)
+
+template <class ContextType>
+void GrammarBuilder<ContextType>::NewVerb(std::vector<std::string> &&verbs)
 {
     EndOfVerb();
     m_verbs = std::move(verbs);
@@ -22,7 +23,8 @@ void GrammarBuilder::NewVerb(std::vector<std::string> &&verbs)
     m_verbHelp << ":" NEWLINE;
 }
 
-GrammarBuilder& GrammarBuilder::ExactWord(const std::string &word)
+template <class ContextType>
+GrammarBuilder<ContextType>& GrammarBuilder<ContextType>::ExactWord(const std::string &word)
 {
     m_lastGrammarLine->EmplaceRule(m_dictionary.TryInsert(word, Dictionary::GRAMMAR));
 
@@ -30,7 +32,8 @@ GrammarBuilder& GrammarBuilder::ExactWord(const std::string &word)
     return *this;
 }
 
-GrammarBuilder& GrammarBuilder::OneOf(const std::vector<std::string> &words)
+template <class ContextType>
+GrammarBuilder<ContextType>& GrammarBuilder<ContextType>::OneOf(const std::vector<std::string> &words)
 {
     bool first = true;
     for (auto &word : words)
@@ -53,33 +56,37 @@ GrammarBuilder& GrammarBuilder::OneOf(const std::vector<std::string> &words)
     return *this;
 }
 
-GrammarBuilder& GrammarBuilder::DirectObject()
+template<class ContextType>
+GrammarBuilder<ContextType>& GrammarBuilder<ContextType>::DirectObject()
 {
     m_lastGrammarLine->EmplaceRule(TokenType::DIRECT);
     if (!m_suppressHelp) m_verbHelp << " " << m_lastGrammarLine->DirectDescription();
     return *this;
 }
 
-GrammarBuilder& GrammarBuilder::IndirectObject()
+template <class ContextType>
+GrammarBuilder<ContextType>& GrammarBuilder<ContextType>::IndirectObject()
 {
     m_lastGrammarLine->EmplaceRule(TokenType::INDIRECT);
     if (!m_suppressHelp) m_verbHelp << " " << m_lastGrammarLine->IndirectDescription();
     return *this;
 }
-    
-void GrammarBuilder::EndOfGrammarLine()
+
+template <class ContextType>
+void GrammarBuilder<ContextType>::EndOfGrammarLine()
 {
     if (m_begin != m_end && !m_suppressHelp) m_verbHelp << NEWLINE;
     m_suppressHelp = false;
 }
 
-void GrammarBuilder::EndOfVerb()
+template <class ContextType>
+void GrammarBuilder<ContextType>::EndOfVerb()
 {
     EndOfGrammarLine();
 
     for (const auto &verb : m_verbs)
     {
-        m_grammar.m_grammarIndex.emplace(verb, VerbInfo {
+        m_parser.m_grammarIndex.emplace(verb, VerbInfo {
                 privileged: m_privileged,
                     begin: m_begin, end: m_end,
                     help: m_verbHelp.str()

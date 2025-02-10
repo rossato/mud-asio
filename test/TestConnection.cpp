@@ -4,7 +4,5 @@
 using namespace Mud::Test;
 
 TestInterface::TestInterface()
-    : Mud::Interface::MudInterface(theProgram().Grammar(),
-                                   theProgram().Server(),
-                                   theProgram().World(),
+    : Mud::Interface::MudInterface(theProgram(),
                                    m_io_service, output) {}

@@ -2,7 +2,7 @@
 #define HELP_ACTIONS_HPP
 
 #include <string>
-#include "Grammar/BasicMatchers.hpp"
+#include "Parser/BasicMatchers.hpp"
 
 namespace Mud
 {
@@ -19,11 +19,10 @@ struct HelpAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
     
-    static void Act(InterfaceType &, int, int);
+    static void Act(Interface::MudInterface &);
 };
 
 struct HelpAboutAction
@@ -31,11 +30,10 @@ struct HelpAboutAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &, int, int);
+    static void Act(Interface::MudInterface &);
 };
 
 struct HelpVerbAction
@@ -43,12 +41,11 @@ struct HelpVerbAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::VerbMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::VerbMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &,
-                    Grammar::VerbMatcher::ValueType, int);
+    static void Act(Interface::MudInterface &,
+                    Parser::VerbMatcher::ValueType);
 };
 
 }

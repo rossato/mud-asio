@@ -1,6 +1,6 @@
 #include "NounMatchEvaluator.hpp"
 
-#include "Grammar/UsageException.hpp"
+#include "Parser/UsageException.hpp"
 #include "World/Noun.hpp"
 
 namespace Mud
@@ -26,13 +26,13 @@ NounMatchEvaluator::NounMatchEvaluator(Dictionary::Tokenizer &tok)
 bool NounMatchEvaluator::IsGrammatical() const
 {
     if (m_firstToken.IsSelf())
-        throw Grammar::UsageException(CANT_SELF);
+        throw Parser::UsageException(CANT_SELF);
 
     if (!m_firstToken.IsNoun()) return false;
 
     if (m_firstToken == Dictionary::Dictionary::It && !m_tokenizer.It())
     {
-        throw Grammar::UsageException("I don't know what \"it\" is.");
+        throw Parser::UsageException("I don't know what \"it\" is.");
     }
 
     return true;
@@ -53,7 +53,7 @@ void NounMatchEvaluator::Evaluate(World::Noun *noun)
         }
         return;
     }
-        
+
     for (; token.IsNoun() && noun->IsReferredToAs(token)
              ; token = m_tokenizer.GetToken(), ++result);
     if (token) m_tokenizer.Unget();
@@ -82,7 +82,7 @@ World::Noun *NounMatchEvaluator::BestCandidate() const
         {
             error << " " << m_tokenizer.GetString();
         }
-        throw Grammar::UsageException(error.str());
+        throw Parser::UsageException(error.str());
     }
     if (m_bestCandidate)
     {
@@ -104,7 +104,7 @@ World::Noun *NounMatchEvaluator::BestCandidate() const
         m_tokenizer.Seek(m_startPos);
         error << "I don't see any \"" << m_tokenizer.GetString() << "\" here.";
     }
-    throw Grammar::UsageException(error.str());
+    throw Parser::UsageException(error.str());
 }
 
 }

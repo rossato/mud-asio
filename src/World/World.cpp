@@ -14,6 +14,7 @@
 
 using namespace Mud::World;
 
+// This is really not the place for this
 void World::TestInit()
 {
     std::cout << "Initializing MUD world with test data..." << std::endl;

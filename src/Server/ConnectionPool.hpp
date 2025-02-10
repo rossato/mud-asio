@@ -61,7 +61,7 @@ public:
         }
     }
 
-    std::pair<int, int> Size() const
+    std::pair<unsigned int, unsigned int> Size() const
     {
         return std::make_pair(m_connections.size(), m_peakConcurrentConnections);
     }
@@ -69,7 +69,7 @@ public:
 private:
     std::list<ConnectionType, boost::fast_pool_allocator<ConnectionType> > m_connections;
     ConnectionFactoryType &m_factory;
-    int m_peakConcurrentConnections;
+    unsigned int m_peakConcurrentConnections;
 };
     
 }

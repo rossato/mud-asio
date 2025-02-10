@@ -9,18 +9,6 @@
 
 namespace Mud
 {
-namespace Grammar
-{
-class Grammar;
-}
-namespace Server
-{
-class Server;
-}
-namespace World
-{
-class World;
-}
 
 namespace Test
 {

@@ -2,23 +2,24 @@
 #define GRAMMAR_BUILDER_HPP
 
 #include "Server/Ansi.hpp"
-#include "Grammar.hpp"
+#include "Parser.hpp"
 
 namespace Mud
 {
-namespace Grammar
+namespace Parser
 {
 
 struct SuppressHelp_t {};
 extern struct SuppressHelp_t SuppressHelp;
 
+template <class ContextType>
 class GrammarBuilder
 {
 public:
-    GrammarBuilder(Grammar &grammar, Dictionary::Dictionary &dictionary)
-        : m_grammar(grammar),
+    GrammarBuilder(Parser<ContextType> &parser, Dictionary::Dictionary &dictionary)
+        : m_parser(parser),
           m_dictionary(dictionary),
-          m_begin(grammar.m_grammars.size()), m_end(m_begin),
+          m_begin(parser.m_grammars.size()), m_end(m_begin),
           m_suppressHelp(false),
           m_privileged(false)
         {}
@@ -60,11 +61,11 @@ private:
     void NewGrammarLineInternal()
     {
         ++m_end;
-        m_lastGrammarLine = m_grammar.m_grammars.emplace_back(
-            std::make_unique<GrammarLine<ActionType> >()
+        m_lastGrammarLine = m_parser.m_grammars.emplace_back(
+            std::make_unique<Grammar<ActionType, ContextType> >()
             ).get();
 
-        auto grammar = m_grammar.m_grammars.rbegin();
+        auto grammar = m_parser.m_grammars.rbegin();
         
         if (m_end - m_begin == 1 ||
             typeid(**grammar) != typeid(**(grammar+1)))
@@ -80,8 +81,8 @@ private:
     void EndOfGrammarLine();
     void EndOfVerb();
 
-    Grammar &m_grammar;
-    GrammarLineBase *m_lastGrammarLine;
+    Parser<ContextType> &m_parser;
+    GrammarBase<ContextType> *m_lastGrammarLine;
     Dictionary::Dictionary &m_dictionary;
     std::ostringstream m_verbHelp;
     std::vector<std::string> m_verbs;
@@ -91,5 +92,7 @@ private:
 
 }
 }
+
+#include "GrammarBuilder-inl.hpp"
 
 #endif

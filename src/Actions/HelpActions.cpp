@@ -1,8 +1,8 @@
 #include "HelpActions.hpp"
 
 #include <iomanip>
-#include "Grammar/Grammar.hpp"
 #include "Interface/MudInterface.hpp"
+#include "Parser/Parser.hpp"
 #include "Server/Ansi.hpp"
 #include "World/World.hpp"
 
@@ -13,7 +13,7 @@ const std::string      HelpAction::Description("General help information");
 const std::string HelpAboutAction::Description("Information about the game");
 const std::string  HelpVerbAction::Description("Get usage for a particular verb");
 
-void HelpAction::Act(InterfaceType &interface, int, int)
+void HelpAction::Act(Interface::MudInterface &interface)
 {
     interface <<
         "For information about the game, try \"help about\"." NEWLINE NEWLINE
@@ -22,7 +22,7 @@ void HelpAction::Act(InterfaceType &interface, int, int)
         "This is the list of known commands:" NEWLINE;
 
     int count = 0;
-    for (const auto &grammar : interface.Grammar().GrammarIndex())
+    for (const auto &grammar : interface.Parser().GrammarIndex())
     {
         if (++count > 7)
         {
@@ -34,7 +34,7 @@ void HelpAction::Act(InterfaceType &interface, int, int)
     interface.Write(NEWLINE);
 }
 
-void HelpAboutAction::Act(Interface::MudInterface &interface, int, int)
+void HelpAboutAction::Act(Interface::MudInterface &interface)
 {
     interface.Write(
         "mud-asio: C++11 MUD Project using the Boost ASIO library," NEWLINE
@@ -42,15 +42,15 @@ void HelpAboutAction::Act(Interface::MudInterface &interface, int, int)
 }
 
 void HelpVerbAction::Act(Interface::MudInterface &interface,
-                         Grammar::VerbMatcher::ValueType verb, int)
+                         Parser::VerbMatcher::ValueType verb)
 {
     if (*verb == "about")
     {
-        HelpAboutAction::Act(interface, 0, 0);
+        HelpAboutAction::Act(interface);
         return;
     }
 
-    const auto &grammarIndex = interface.Grammar().GrammarIndex();
+    const auto &grammarIndex = interface.Parser().GrammarIndex();
     const auto verbHelp = grammarIndex.find(*verb);
 
     if (verbHelp == grammarIndex.end())

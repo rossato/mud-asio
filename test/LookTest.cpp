@@ -15,7 +15,7 @@ using namespace Mud::Actions;
 
 TEST_F(LookTest, DumpLookAction)
 {
-    LookAction::Act(ken, 0, 0);
+    LookAction::Act(ken);
     std::cout << ken.output.str() << std::endl;
 
     EXPECT_NE(ken.output.str().find("Place"), std::string::npos);
@@ -33,7 +33,7 @@ TEST_F(LookTest, ObserveOtherUser)
     paul.HandleLine("w");
 
     ken.output.str("");
-    LookAction::Act(ken, 0, 0);
+    LookAction::Act(ken);
 
     EXPECT_NE(ken.output.str().find("Paul is here."), std::string::npos);
 }

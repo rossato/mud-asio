@@ -1,22 +1,23 @@
 #include "Actions.hpp"
-#include "Grammar/GrammarBuilder.hpp"
+#include "Interface/MudParser.hpp"
+#include "Parser/GrammarBuilder.hpp"
 #include "AdminActions.hpp"
 #include "BasicActions.hpp"
 #include "HelpActions.hpp"
 #include "ItemHandling.hpp"
 
-using namespace Mud::Grammar;
 using namespace Mud::Actions;
+using namespace Mud::Parser;
 
 namespace Mud
 {
 namespace Actions
 {
 
-void PopulateGrammarWithActions(Grammar::Grammar &grammar, Dictionary::Dictionary &dictionary)
+void PopulateParserWithActions(Interface::MudParser &parser, Dictionary::Dictionary &dictionary)
 {
     std::cout << "Initializing rules of grammar..." << std::endl;
-    GrammarBuilder builder(grammar, dictionary);
+    GrammarBuilder<Interface::MudInterface> builder(parser, dictionary);
 
     // HelpActions.hpp
 

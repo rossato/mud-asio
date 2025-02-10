@@ -2,6 +2,7 @@
 #define WORLD_TEST_HPP
 
 #include "Program/MudProgram.hpp"
+#include "World/World.hpp"
 #include "TestConnection.hpp"
 //#include "HeadlessUser.hpp"
 

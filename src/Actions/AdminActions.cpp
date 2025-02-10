@@ -9,7 +9,7 @@ const std::string ShutdownHelpAction::Description("Explain shutdown options");
 const std::string ShutdownCancelAction::Description("Cancel a previously scheduled shutdown");
 const std::string DebugAction::Description("Enter Lua debugging mode");
 
-void DebugAction::Act(InterfaceType &interface, int, int)
+void DebugAction::Act(InterfaceType &interface)
 {
     interface.Write(
         NEWLINE

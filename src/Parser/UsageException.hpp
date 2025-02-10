@@ -5,7 +5,7 @@
 
 namespace Mud
 {
-namespace Grammar
+namespace Parser
 {
 
 class UsageException : public std::exception

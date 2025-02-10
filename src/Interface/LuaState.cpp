@@ -1,6 +1,8 @@
 #include "LuaState.hpp"
 
 #include "Server/Ansi.hpp"
+#include "World/User.hpp"
+#include "World/World.hpp"
 #include "MudInterface.hpp"
 #include "ParsingGrammarState.hpp"
 
@@ -14,7 +16,7 @@ LuaState::LuaState(MudInterface &interface)
 
 void LuaState::HandleLine()
 {
-    auto line = m_interface.DumpRestOfLine();
+    auto line = m_interface.Tokenizer().DumpRestOfLine();
     if (line.empty())
     {
         m_commandInProgress.str("");

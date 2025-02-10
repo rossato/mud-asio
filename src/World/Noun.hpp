@@ -74,7 +74,8 @@ protected:
     Noun *m_here;
 
 private:
-    std::vector<std::pair<Direction, int> > m_exitIndexes;
+    // This is absolutely fascinating.  Non-const in std::pair triggers -Wrange-loop-construct.
+    std::vector<std::pair<const Direction, const int> > m_exitIndexes;
     std::map<Direction, Noun*> m_exits;
 
     std::string m_indefiniteName, m_definiteName, m_capDefiniteName, m_description;

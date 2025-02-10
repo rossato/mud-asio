@@ -1,6 +1,7 @@
 #include "HandlePasswordState.hpp"
 
 #include "Server/Ansi.hpp"
+#include "World/User.hpp"
 #include "HandleLoginState.hpp"
 #include "MudInterface.hpp"
 #include "ParsingGrammarState.hpp"
@@ -12,7 +13,7 @@ void HandlePasswordState::HandleLine()
     m_interface.Write(ECHOON NEWLINE);
     auto &user = m_interface.User();
     
-    if (user.Verify(m_interface.GetString()))
+    if (user.Verify(m_interface.Tokenizer().GetString()))
     {
         user.RegisterConnection(m_interface);
         std::cout << "New login for user " << user.Name() << "." NEWLINE;

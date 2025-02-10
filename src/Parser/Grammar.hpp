@@ -1,19 +1,25 @@
-#ifndef GRAMMAR_LINE_HPP
-#define GRAMMAR_LINE_HPP
+#ifndef GRAMMAR_HPP
+#define GRAMMAR_HPP
+
+#include <type_traits>
 
 #include "Dictionary/Tokenizer.hpp"
+#include "BasicMatchers.hpp"
 #include "TokenRule.hpp"
 
 namespace Mud
 {
-namespace Grammar
+namespace Parser
 {
 
-class GrammarLineBase
+template <class ContextType> class GrammarBuilder;
+    
+template <class ContextType>
+class GrammarBase
 {
 public:
-    virtual ~GrammarLineBase() = default;
-    virtual bool TryParse(Dictionary::Tokenizer &tok) const = 0;
+    virtual ~GrammarBase() = default;
+    virtual bool TryParse(ContextType &c, Dictionary::Tokenizer &tok) const = 0;
 
     template <class T>
     void EmplaceRule(T &&rule)
@@ -25,7 +31,7 @@ public:
     virtual const std::string &IndirectDescription() const = 0;
 
 protected:
-    std::vector<TokenRule> m_rules;
+    std::vector<TokenRule> m_rules;    
 };
 
 ////////////////////////////////////////////////////////
@@ -36,29 +42,31 @@ protected:
 // Would love to use a function template instead of static-casts,
 //  but function templates and virtual functions don't mix.
 //
-template <class ActionType>
-class GrammarLine : public GrammarLineBase
+template <class ActionType, class ContextType>
+class Grammar : public GrammarBase<ContextType>
 {
+    friend class GrammarBuilder<ContextType>;
+    
     typedef typename ActionType::DirectMatcher   DirectMatcher;
     typedef typename ActionType::IndirectMatcher IndirectMatcher;
 
 public:
-    virtual bool TryParse(Dictionary::Tokenizer &tok) const override
+    virtual bool TryParse(ContextType &c, Dictionary::Tokenizer &tokenizer) const override
     {
         typename DirectMatcher::ValueType direct;
         typename IndirectMatcher::ValueType indirect;
+        
+        std::vector<TokenRule>::const_iterator rule, end = this->m_rules.end();
 
-        Dictionary::Token token;
-
-        std::vector<TokenRule>::const_iterator rule, end = m_rules.end();
-
-        for (rule = m_rules.begin(); rule != end;)
+        for (rule = this->m_rules.begin(); rule != end;)
         {
+            Dictionary::Token token;        
             bool found = false;
+
             switch (rule->tokenType)
             {
             case TokenType::GRAMMAR:
-                token = tok.GetToken();
+                token = tokenizer.GetToken();
                 for (; rule != end && rule->tokenType == TokenType::GRAMMAR; ++rule)
                     if (rule->token == token) found = true;
 
@@ -66,18 +74,14 @@ public:
                 continue;
 
             case TokenType::DIRECT:
-                if (!(direct = DirectMatcher::Match(
-                          static_cast<typename DirectMatcher::InterfaceType&>(tok)
-                          )))
+                if (!(direct = DirectMatcher::Match(c, tokenizer)))
                 {
                     return false;
                 }
                 break;
 
             case TokenType::INDIRECT:
-                if (!(indirect = IndirectMatcher::Match(
-                          static_cast<typename IndirectMatcher::InterfaceType&>(tok)
-                          )))
+                if (!(indirect = IndirectMatcher::Match(c, tokenizer)))
                 {
                     return false;
                 }
@@ -85,9 +89,17 @@ public:
             }
             ++rule;
         }
-        if (tok) return false;
+        if (tokenizer) return false;
 
-        ActionType::Act(static_cast<typename ActionType::InterfaceType&>(tok), direct, indirect);
+        if constexpr (std::is_same_v<DirectMatcher, NoneMatcher>) {
+            ActionType::Act(c);
+        }
+        else if constexpr (std::is_same_v<IndirectMatcher, NoneMatcher>) {
+            ActionType::Act(c, direct);
+        }
+        else {
+            ActionType::Act(c, direct, indirect);
+        }
         return true;
     }
 

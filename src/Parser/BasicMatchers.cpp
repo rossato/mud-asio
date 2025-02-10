@@ -1,6 +1,6 @@
 #include "BasicMatchers.hpp"
 
-using namespace Mud::Grammar;
+using namespace Mud::Parser;
 
 const std::string NoneMatcher::Description("");
 const std::string NumberMatcher::Description("<number>");

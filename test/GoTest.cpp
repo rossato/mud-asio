@@ -20,7 +20,7 @@ using namespace Mud::Actions;
 
 TEST_F(GoTest, DumpGoAction)
 {
-    GoAction::Act(ken, Mud::World::E, 0);
+    GoAction::Act(ken, Mud::World::E);
     std::cout << ken.output.str() << std::endl;
 
     ThenUserShouldBeInTheOtherPlace();
@@ -28,36 +28,36 @@ TEST_F(GoTest, DumpGoAction)
 
 TEST_F(GoTest, GoDirActionWorks)
 {
-    GoDirAction<Mud::World::E>::Act(ken, 0, 0);
+    GoDirAction<Mud::World::E>::Act(ken);
     ThenUserShouldBeInTheOtherPlace();
 }
 
 TEST_F(GoTest, GoBadDirectionFails)
 {
     Mud::World::Location *before = ken.User().GetLocation();
-    GoAction::Act(ken, Mud::World::N, 0);
+    GoAction::Act(ken, Mud::World::N);
     EXPECT_EQ(before, ken.User().GetLocation());
 }
 
 TEST_F(GoTest, DirectionTokenMatches)
 {
     std::string line("go east");
-    ken.Str(line);
-    ken.GetString();
+    ken.Tokenizer().Str(line);
+    ken.Tokenizer().GetString();
     EXPECT_EQ(
         Mud::World::E,
-        DirectionMatcher::Match(ken)
+        DirectionMatcher::Match(ken, ken.Tokenizer())
         );
 }
 
 TEST_F(GoTest, BadDirectionDoesntMatch)
 {
     std::string line("go about");
-    ken.Str(line);
-    ken.GetString();
+    ken.Tokenizer().Str(line);
+    ken.Tokenizer().GetString();
     EXPECT_EQ(
         Mud::World::NODIR,
-        DirectionMatcher::Match(ken)
+        DirectionMatcher::Match(ken, ken.Tokenizer())
         );
 }
 

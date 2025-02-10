@@ -11,12 +11,12 @@ class HelpTest : public ::testing::Test, public HasWorld
 {
 };
 
-using namespace Mud::Grammar;
 using namespace Mud::Actions;
+using namespace Mud::Parser;
 
 TEST_F(HelpTest, DumpHelpAction)
 {
-    HelpAction::Act(ken, 0, 0);
+    HelpAction::Act(ken);
     std::cout << ken.output.str() << std::endl;
 
     EXPECT_NE(ken.output.str().find("For information about the game"),
@@ -26,7 +26,7 @@ TEST_F(HelpTest, DumpHelpAction)
 
 TEST_F(HelpTest, DumpHelpAboutAction)
 {
-    HelpAboutAction::Act(ken, 0, 0);
+    HelpAboutAction::Act(ken);
     std::cout << ken.output.str() << std::endl;
 
     EXPECT_NE(ken.output.str().find("C++11 MUD Project"),
@@ -36,7 +36,7 @@ TEST_F(HelpTest, DumpHelpAboutAction)
 TEST_F(HelpTest, DumpHelpVerbAction)
 {
     std::string help("help");
-    HelpVerbAction::Act(ken, &help, 0);
+    HelpVerbAction::Act(ken, &help);
     std::cout << ken.output.str() << std::endl;
 
     EXPECT_NE(ken.output.str().find("Get usage for a particular verb"), std::string::npos);
@@ -45,9 +45,9 @@ TEST_F(HelpTest, DumpHelpVerbAction)
 TEST_F(HelpTest, VerbTokenMatches)
 {
     std::string line("help help");
-    ken.Str(line);
+    ken.Tokenizer().Str(line);
 
-    auto value = VerbMatcher::Match(ken);
+    auto value = VerbMatcher::Match(ken, ken.Tokenizer());
 
     ASSERT_TRUE(!!value);
     EXPECT_EQ(*value, std::string("help"));

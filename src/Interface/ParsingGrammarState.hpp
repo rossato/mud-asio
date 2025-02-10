@@ -2,12 +2,13 @@
 #define PARSING_GRAMMAR_STATE_HPP
 
 #include "InterfaceStateBase.hpp"
+#include "MudParser.hpp"
 
 namespace Mud
 {
-namespace Grammar
+namespace Dictionary
 {
-class Grammar;
+class Tokenizer;
 }
 
 namespace Interface
@@ -22,7 +23,8 @@ public:
     virtual void Prompt() override;
 
 private:
-    Grammar::Grammar &m_grammar;
+    MudParser &m_parser;
+    Dictionary::Tokenizer &m_tokenizer;
 };
 
 }

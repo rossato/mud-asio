@@ -12,12 +12,12 @@ class SayTest : public ::testing::Test, public HasWorld
 };
 
 using namespace Mud::Actions;
-using namespace Mud::Grammar;
+using namespace Mud::Parser;
 
 TEST_F(SayTest, DumpSayAction)
 {
     RestOfLineMatcher::ValueType value("hello");
-    SayAction::Act(ken, value, 0);
+    SayAction::Act(ken, value);
     std::cout << ken.output.str() << std::endl;
 
     EXPECT_NE(ken.output.str().find("You say"), std::string::npos);
@@ -31,7 +31,7 @@ TEST_F(SayTest, DumpSayActionObserved)
 
     ken.output.str("");
     RestOfLineMatcher::ValueType value("hello");
-    SayAction::Act(paul, value, 0);
+    SayAction::Act(paul, value);
 
     std::cout << ken.output.str() << std::endl;
 

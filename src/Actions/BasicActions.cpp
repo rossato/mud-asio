@@ -5,6 +5,7 @@
 #include "Interface/MudInterface.hpp"
 #include "Server/Ansi.hpp"
 #include "World/Location.hpp"
+#include "World/User.hpp"
 
 using namespace Mud::Actions;
 
@@ -16,14 +17,14 @@ const std::string        GoAction::Description("Travel in a direction");
 const std::string GoNowhereAction::Description("Prompt for a direction to go");
 const std::string       SayAction::Description("Speak a line of text to those in the same area as you");
 
-void QuitAction::Act(InterfaceType &interface, int, int)
+void QuitAction::Act(Interface::MudInterface &interface)
 {
     interface.Write("Goodbye!" NEWLINE);
     interface.Close("user request");
     interface.ChangeState<Interface::ClosingState>();
 }
 
-void LookAction::Act(InterfaceType &interface, int, int)
+void LookAction::Act(Interface::MudInterface &interface)
 {
     auto &user = interface.User();
 
@@ -42,7 +43,7 @@ void LookAction::Act(InterfaceType &interface, int, int)
     }
 }
 
-void GoAction::Act(InterfaceType &interface, World::Direction dir, int)
+void GoAction::Act(Interface::MudInterface &interface, typename DirectMatcher::ValueType dir)
 {
     if (dir == World::NODIR)
     {
@@ -57,7 +58,7 @@ void GoAction::Act(InterfaceType &interface, World::Direction dir, int)
         user.SetLocation(location);
 
         interface << "You leave to " << dir << "." NEWLINE;
-        LookAction::Act(interface, 0, 0);
+        LookAction::Act(interface);
 
         location->UserArriving(user);
     }
@@ -67,8 +68,7 @@ void GoAction::Act(InterfaceType &interface, World::Direction dir, int)
     }
 }
 
-void SayAction::Act(InterfaceType &interface,
-                    Grammar::RestOfLineMatcher::ValueType &line, int)
+void SayAction::Act(Interface::MudInterface &interface, const typename DirectMatcher::ValueType &line)
 {
     if (line->empty())
     {

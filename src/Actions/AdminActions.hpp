@@ -1,8 +1,8 @@
 #ifndef ADMIN_VERBS_HPP
 #define ADMIN_VERBS_HPP
 
-#include "Grammar/BasicMatchers.hpp"
 #include "Interface/MudInterface.hpp"
+#include "Parser/BasicMatchers.hpp"
 #include "Server/Ansi.hpp"
 #include "Server/Server.hpp"
 #include "World/World.hpp"
@@ -17,11 +17,11 @@ struct ShutdownAction
     static const std::string Description;
     static const bool RequiresPrivilege = true;
 
-    typedef Grammar::NumberMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Parser::NumberMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
     typedef Interface::MudInterface InterfaceType;
 
-    static void Act(InterfaceType &interface, DirectMatcher::ValueType seconds, int)
+    static void Act(InterfaceType &interface, DirectMatcher::ValueType seconds)
     {
         // todo call world cleanup
         // todo permission checking
@@ -43,11 +43,11 @@ struct ShutdownHelpAction
     static const std::string Description;
     static const bool RequiresPrivilege = true;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
     typedef Interface::MudInterface InterfaceType;
 
-    static void Act(InterfaceType &interface, int, int)
+    static void Act(InterfaceType &interface)
     {
         interface.Write(
             "When would you like to shutdown the server?" NEWLINE
@@ -61,13 +61,13 @@ struct ShutdownNowAction
     static const std::string Description;
     static const bool RequiresPrivilege = true;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
     typedef Interface::MudInterface InterfaceType;
 
-    static void Act(InterfaceType &interface, int, int)
+    static void Act(InterfaceType &interface)
     {
-        ShutdownAction::Act(interface, 0, 0);
+        ShutdownAction::Act(interface, 0);
     }
 };
 
@@ -76,11 +76,11 @@ struct ShutdownCancelAction
     static const std::string Description;
     static const bool RequiresPrivilege = true;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
     typedef Interface::MudInterface InterfaceType;
 
-    static void Act(InterfaceType &interface, int, int)
+    static void Act(InterfaceType &interface)
     {
         std::cout << "Server received request from " << interface.User().Name() << " to cancel shut down." NEWLINE;
 
@@ -94,11 +94,11 @@ struct DebugAction
     static const std::string Description;
     static const bool RequiresPrivilege = true;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
     typedef Interface::MudInterface InterfaceType;
 
-    static void Act(InterfaceType &interface, int, int);
+    static void Act(InterfaceType &interface);
 };
     
 }

@@ -1,7 +1,7 @@
 #ifndef BASIC_ACTIONS_HPP
 #define BASIC_ACTIONS_HPP
 
-#include "Grammar/BasicMatchers.hpp"
+#include "Parser/BasicMatchers.hpp"
 #include "World/Direction.hpp"
 
 namespace Mud
@@ -9,10 +9,6 @@ namespace Mud
 namespace Interface
 {
 class MudInterface;
-}
-namespace World
-{
-class User;
 }
 
 namespace Actions
@@ -23,11 +19,10 @@ struct QuitAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
-
-    static void Act(InterfaceType &interface, int, int);
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
+    
+    static void Act(Interface::MudInterface &);
 };
 
 struct LookAction
@@ -35,11 +30,10 @@ struct LookAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
-
-    static void Act(InterfaceType &interface, int, int);
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
+    
+    static void Act(Interface::MudInterface &);
 };
 
 struct SayAction
@@ -47,11 +41,10 @@ struct SayAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::RestOfLineMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::RestOfLineMatcher DirectMatcher;
+    typedef Parser::NoneMatcher       IndirectMatcher;
 
-    static void Act(InterfaceType &interface, Grammar::RestOfLineMatcher::ValueType &line, int);
+    static void Act(Interface::MudInterface &, const typename DirectMatcher::ValueType &);
 };
 
 struct DirectionMatcher
@@ -59,24 +52,23 @@ struct DirectionMatcher
     static const std::string Description;
     
     typedef World::Direction ValueType;
-    typedef Dictionary::Tokenizer InterfaceType;
-    
-    static ValueType Match(InterfaceType &tok)
+
+    template <class ContextType>
+    static ValueType Match(ContextType &, Dictionary::Tokenizer &tokenizer)
     {
-        return World::TokenToDirection(tok.GetToken());
+        return World::TokenToDirection(tokenizer.GetToken());
     }
 };
-    
+
 struct GoAction
 {
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef DirectionMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef DirectionMatcher     DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &interface, DirectionMatcher::ValueType dir, int);
+    static void Act(Interface::MudInterface &, typename DirectionMatcher::ValueType);
 };
 
 struct GoNowhereAction
@@ -84,13 +76,12 @@ struct GoNowhereAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &interface, int, int)
+    static void Act(Interface::MudInterface &interface)
     {
-        GoAction::Act(interface, World::NODIR, 0);
+        GoAction::Act(interface, World::NODIR);
     }
 };
 
@@ -100,13 +91,12 @@ struct GoDirAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef Grammar::NoneMatcher DirectMatcher;
-    typedef Grammar::NoneMatcher IndirectMatcher;
-    typedef Interface::MudInterface InterfaceType;
+    typedef Parser::NoneMatcher DirectMatcher;
+    typedef Parser::NoneMatcher IndirectMatcher;
 
-    static void Act(InterfaceType &interface, int, int)
+    static void Act(Interface::MudInterface &interface)
     {
-        GoAction::Act(interface, dir, 0);
+        GoAction::Act(interface, dir);
     }
 };
 

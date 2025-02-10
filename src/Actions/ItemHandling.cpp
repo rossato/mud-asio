@@ -1,6 +1,6 @@
 #include "ItemHandling.hpp"
-#include "Grammar/UsageException.hpp"
 #include "Interface/MudInterface.hpp"
+#include "Parser/UsageException.hpp"
 #include "Server/Ansi.hpp"
 #include "World/Location.hpp"
 #include "World/Noun.hpp"
@@ -18,9 +18,11 @@ std::string      TakeAction::Description("Pick up an item in the current area");
 std::string      DropAction::Description("Put down an item that you have");
 std::string InventoryAction::Description("List the things that you have");
 
-NounMatcher::ValueType NounMatcher::Match(InterfaceType &interface)
+// TODO Match via Scopes?
+
+NounMatcher::ValueType NounMatcher::Match(Interface::MudInterface &interface, Dictionary::Tokenizer &tokenizer)
 {   
-    NounMatchEvaluator nounEvaluator(interface);
+    NounMatchEvaluator nounEvaluator(tokenizer);
 
     auto &actor = interface.User();
     
@@ -37,9 +39,9 @@ NounMatcher::ValueType NounMatcher::Match(InterfaceType &interface)
     nounEvaluator.ThrowMissingNounException();
 }
 
-HeldMatcher::ValueType HeldMatcher::Match(InterfaceType &interface)
+HeldMatcher::ValueType HeldMatcher::Match(Interface::MudInterface &interface, Dictionary::Tokenizer &tokenizer)
 {
-    NounMatchEvaluator itemEvaluator(interface);
+    NounMatchEvaluator itemEvaluator(tokenizer);
 
     if (!itemEvaluator.IsGrammatical()) return nullptr;
 
@@ -51,32 +53,33 @@ HeldMatcher::ValueType HeldMatcher::Match(InterfaceType &interface)
 
     itemEvaluator.EvaluateItemsInLocation(*actor.GetLocation());
 
-    if (candidate = itemEvaluator.BestCandidate())
+    if ((candidate = itemEvaluator.BestCandidate()))
     {
         // TODO Implicit take?
         
         std::ostringstream error;
         error << "You don't have " << candidate->theName() << ".";
-        throw Grammar::UsageException(error.str());
+        throw Parser::UsageException(error.str());
     }
 
     itemEvaluator.EvaluateUsersInLocation(*actor.GetLocation());
 
-    if (candidate = itemEvaluator.BestCandidate())
+    if ((candidate = itemEvaluator.BestCandidate()))
     {
         if (candidate == &actor)
-            throw Grammar::UsageException(CANT_SELF);
+            throw Parser::UsageException(CANT_SELF);
         
         std::ostringstream error;
         error << candidate->Name() << " wouldn't appreciate that very much.";
-        throw Grammar::UsageException(error.str());
+        throw Parser::UsageException(error.str());
     }
 
     itemEvaluator.ThrowMissingNounException();
 }
 
-void LookAtAction::Act(InterfaceType &interface,
-                       NounMatcher::ValueType noun, int)
+// TODO these Acts should all be in Lua
+
+void LookAtAction::Act(Interface::MudInterface &interface, NounMatcher::ValueType noun)
 {
     if (noun == &interface.User())
     {
@@ -88,8 +91,7 @@ void LookAtAction::Act(InterfaceType &interface,
     }
 }
     
-void TakeAction::Act(InterfaceType &interface,
-                     NounMatcher::ValueType item, int)
+void TakeAction::Act(Interface::MudInterface &interface, NounMatcher::ValueType item)
 {
     auto &user = interface.User();
     if (item == &user)
@@ -124,8 +126,7 @@ void TakeAction::Act(InterfaceType &interface,
     interface << "You take " << item->theName() << "." NEWLINE;
 }
 
-void DropAction::Act(InterfaceType &interface,
-                     HeldMatcher::ValueType item, int)
+void DropAction::Act(Interface::MudInterface &interface, HeldMatcher::ValueType item)
 {
     auto &user = interface.User();
     user.GetLocation()->AddItem(*item);
@@ -138,7 +139,7 @@ void DropAction::Act(InterfaceType &interface,
     interface << "You drop " << item->theName() << "." NEWLINE;
 }
 
-void InventoryAction::Act(InterfaceType &interface, int, int)
+void InventoryAction::Act(Interface::MudInterface &interface)
 {
     interface.Write("You have the following items: " NEWLINE);
 
