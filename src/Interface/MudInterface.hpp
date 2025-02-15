@@ -35,6 +35,7 @@ public:
     MudInterface(Program::MudProgram &program,
                  Args &&... args)
         : Server::ConnectionBase(std::forward<Args>(args)...),
+          m_user(nullptr),
           m_tokenizer(program.Dictionary()),
           m_program(program)
     {
@@ -45,6 +46,7 @@ public:
     MudInterface &operator=(Args &&... args)
     {
         Server::ConnectionBase::operator=(std::forward<Args>(args)...);
+        m_user = nullptr;
 
         Welcome();
 
