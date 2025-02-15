@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "ConnectionBase.hpp"
 #include "Ansi.hpp"
 
@@ -5,9 +7,8 @@ using namespace Mud::Server;
 
 void ConnectionBase::Close(const std::string &reason)
 {
-    *m_outputStream << NEWLINE "Server is closing connection for reason: "
-                    << reason << "." NEWLINE;
-    WriteToSocket();
+    std::cout << "Server is closing connection #" << m_connectionNumber
+              << " for reason: " << reason << "." << std::endl;
 
     m_socket.shutdown(SocketType::shutdown_receive);
 }
@@ -61,7 +62,7 @@ void ConnectionBase::WriteToSocket()
         {
             // This was previously a potential issue when m_onClose deleted "this".
             //  Workaround would be:
-            //  boost::asio:post(m_socket.get_executor(), std::move(m_onClose));
+            //  boost::asio::defer(m_socket.get_executor(), std::move(m_onClose));
 
             m_onClose();
             m_socket.close();
