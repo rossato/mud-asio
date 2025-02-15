@@ -55,7 +55,7 @@ public:
     {
         typename DirectMatcher::ValueType direct;
         typename IndirectMatcher::ValueType indirect;
-        
+
         std::vector<TokenRule>::const_iterator rule, end = this->m_rules.end();
 
         for (rule = this->m_rules.begin(); rule != end;)

@@ -28,7 +28,6 @@ void ParsingGrammarState::HandleLine()
     {
         m_interface << "Parser error: " << e.what() << NEWLINE;
     }
-
 }
 
 void ParsingGrammarState::Prompt()

@@ -20,6 +20,16 @@ public:
         ReadLine();
     }
 
+    LineOrientedConnection<InterfaceType> &operator=(typename InterfaceType::SocketType &&socket)
+    {
+        InterfaceType::operator=(std::move(socket));
+
+        m_inputBuffer.consume(m_inputBuffer.size());
+        ReadLine();
+
+        return *this;
+    }
+
 private:
     void ReadLine();
 

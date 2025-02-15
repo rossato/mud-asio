@@ -41,6 +41,16 @@ public:
         Welcome();
     }
 
+    template <class... Args>
+    MudInterface &operator=(Args &&... args)
+    {
+        Server::ConnectionBase::operator=(std::forward<Args>(args)...);
+
+        Welcome();
+
+        return *this;
+    }
+
     void HandleLine(const std::string &line)
     {
         m_tokenizer.Str(line);

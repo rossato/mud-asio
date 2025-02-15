@@ -25,6 +25,15 @@ public:
           m_server(server)
     {}
 
+    template <class... Args>
+    HttpInterface &operator=(Args &&... args)
+    {
+        Server::ConnectionBase::operator=(std::forward<Args>(args)...);
+        m_requestHeaders.clear();
+        m_method.clear();
+        return *this;
+    }
+
     void HandleLine(const std::string &line);
     void HandleClose() {}
     

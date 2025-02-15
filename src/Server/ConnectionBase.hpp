@@ -66,8 +66,11 @@ public:
           m_outputStream(&testOutput),
           m_reading(true),
           m_writing(true), // This causes WriteToSocket to be a no-op
-          m_moreToWrite(false)
+          m_moreToWrite(false),
+          m_connectionNumber(NumConnections++)
     {}
+
+    const unsigned int ConnectionNumber() const { return m_connectionNumber; }
 
 protected:
     ConnectionBase(SocketType &&socket)
@@ -78,9 +81,12 @@ protected:
           m_bufferBeingWritten(&m_outputBuffer2),
           m_outputStream(&m_outputStream1),
           m_streamBeingWritten(&m_outputStream2),
-          m_reading(true), m_writing(false), m_moreToWrite(false)
+          m_reading(true), m_writing(false), m_moreToWrite(false),
+          m_connectionNumber(NumConnections++)
     {}
     ~ConnectionBase() = default;
+
+    ConnectionBase &operator=(SocketType &&socket);
     
     void DoneReading() { m_reading = false; WriteToSocket(); }
 
@@ -97,6 +103,9 @@ private:
 
     bool m_reading, m_writing, m_moreToWrite;
     std::function<void()> m_onClose;
+
+    static unsigned int NumConnections;
+    unsigned int m_connectionNumber;
 };
 
 }

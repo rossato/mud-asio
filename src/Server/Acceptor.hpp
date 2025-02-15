@@ -50,6 +50,13 @@ private:
             if (!error)
             {
                 m_connectionPool.OpenNewConnection(std::move(m_nextSocket));
+
+                // std::moving into a new socket is fine,
+                //  but moving into a previously *closed* socket is problematic.
+                // Debugging this error was fun because it would consistently
+                //  show up on the third connection.
+                m_nextSocket = boost::asio::ip::tcp::socket(m_acceptor.get_executor());
+
                 Accept();
             }
             else if (error != boost::asio::error::operation_aborted)

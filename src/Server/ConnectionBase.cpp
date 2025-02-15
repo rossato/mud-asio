@@ -12,6 +12,22 @@ void ConnectionBase::Close(const std::string &reason)
     m_socket.shutdown(SocketType::shutdown_receive);
 }
 
+ConnectionBase &ConnectionBase::operator=(SocketType &&socket)
+{
+    // precondition: connection is closed!
+
+    m_socket = std::move(socket);
+
+    m_outputBuffer1.consume(m_outputBuffer1.size());
+    m_outputBuffer2.consume(m_outputBuffer2.size());
+
+    m_reading     = true;
+    m_writing     = false;
+    m_moreToWrite = false;
+
+    return *this;
+}
+
 void ConnectionBase::WriteToSocket()
 {
     if (m_writing)
@@ -41,6 +57,16 @@ void ConnectionBase::WriteToSocket()
             return;
         }
 
-        if (!m_reading) m_onClose();
+        if (!m_reading)
+        {
+            // This was previously a potential issue when m_onClose deleted "this".
+            //  Workaround would be:
+            //  boost::asio:post(m_socket.get_executor(), std::move(m_onClose));
+
+            m_onClose();
+            m_socket.close();
+        }
     });
 }
+
+unsigned int ConnectionBase::NumConnections(0);

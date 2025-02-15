@@ -18,7 +18,7 @@ pkg_check_modules( LUA REQUIRED lua )
 include_directories( ${Boost_INCLUDE_DIR} . )
 
 set(CMAKE_CXX_STANDARD 17)
-add_compile_options(-Wall -Werror=return-type -Werror=reorder)
+add_compile_options(-Wall -Wno-maybe-uninitialized -Werror=return-type -Werror=reorder)
 
 include_directories(src)
 set(SRCS

@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <list>
-#include <boost/pool/pool_alloc.hpp>
 
 namespace Mud
 {
@@ -21,10 +20,24 @@ public:
 
     void OpenNewConnection(boost::asio::ip::tcp::socket &&socket)
     {
-        m_factory.CreateConnection(*this, std::move(socket));
+        auto newConnection = m_closedConnections.begin();
+        if (newConnection == m_closedConnections.end())
+        {
+            m_factory.CreateConnection(*this, std::move(socket));
+            newConnection = m_connections.begin();
+        }
+        else
+        {
+            // This is a questionable optimization
+            //  because if done incorrectly reusing objects can be a security issue.
+            // Nonetheless this reduces allocations and was fun to implement.
+
+            *newConnection = std::move(socket);
+            m_connections.splice(m_connections.begin(), m_closedConnections, newConnection);
+        }
 
         std::cout << "ConnectionPool(" << ConnectionFactoryType::ConnectionTypeDescription
-                  << ") is opening connection, total is now "
+                  << ") is opening connection #" << newConnection->ConnectionNumber() << ", total is now "
                   << m_connections.size() << "." << std::endl;
 
         if (m_connections.size() > m_peakConcurrentConnections)
@@ -35,14 +48,13 @@ public:
                       << "." << std::endl;
         }
 
-        auto newConnection = m_connections.begin();
         newConnection->SetCloseHandler(
         [this, newConnection]
         {
-            m_connections.erase(newConnection);
+            m_closedConnections.splice(m_closedConnections.end(), m_connections, newConnection);
             std::cout << "ConnectionPool(" << ConnectionFactoryType::ConnectionTypeDescription
-                      << ") has removed connection, " << m_connections.size()
-                      << " remaining." << std::endl;
+                      << ") has closed connection #" << newConnection->ConnectionNumber()
+                      << ", " << m_connections.size() << " remaining." << std::endl;
         });
     }
 
@@ -67,7 +79,8 @@ public:
     }
     
 private:
-    std::list<ConnectionType, boost::fast_pool_allocator<ConnectionType> > m_connections;
+    std::list<ConnectionType> m_connections;
+    std::list<ConnectionType> m_closedConnections;
     ConnectionFactoryType &m_factory;
     unsigned int m_peakConcurrentConnections;
 };
