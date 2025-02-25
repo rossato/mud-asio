@@ -3,6 +3,7 @@
 #include "Dictionary/Tokenizer.hpp"
 #include "Server/Ansi.hpp"
 #include "World/User.hpp"
+#include "World/World.hpp"
 #include "HandleLoginState.hpp"
 
 using namespace Mud::Interface;
@@ -24,4 +25,9 @@ void MudInterface::HandleLine(const std::string &line)
 void MudInterface::HandleClose()
 {
     if (m_user) m_user->DeregisterConnection(*this);
+}
+
+Mud::World::User *MudInterface::LoadUser(const std::string &userName)
+{
+    return m_user = m_program.World().GetUser(userName);
 }

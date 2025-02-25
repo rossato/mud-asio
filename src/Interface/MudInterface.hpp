@@ -63,19 +63,20 @@ public:
     void HandleLine(const std::string &line);
     void HandleClose();
 
-    void SetUser(World::User &user) { m_user = &user; }
-    World::User &User() const { return *m_user; }
-
-    MudParser      &Parser() const { return m_program.Parser(); }
-    Server::Server &Server() const { return m_program.Server(); }
-    World::World   &World()  const { return m_program.World();  }
-
     template <class StateType>
     void ChangeState()
     {
         m_state = std::make_unique<StateType>(*this);
     }
-    
+
+    // Interface-local state
+    World::User *LoadUser(const std::string &);
+    World::User &User() const { return *m_user; }
+
+    // Global state
+    MudParser      &Parser() const { return m_program.Parser(); }
+    Server::Server &Server() const { return m_program.Server(); }
+
 private:
     void Welcome();
 

@@ -32,7 +32,7 @@ void LuaState::HandleLine(Dictionary::Tokenizer &tokenizer)
     }
 
     auto &ostream = m_interface.ostream();
-    auto &lua = m_interface.World().Lua();
+    auto &lua = m_interface.User().World().Lua(); // Is this really where Lua global state should live?
 
     m_commandInProgress << line << '\n';
     if (lua.HandleLine(m_commandInProgress.str(), ostream))

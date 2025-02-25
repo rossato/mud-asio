@@ -54,6 +54,8 @@ public:
     void AddToInventory(Noun &item) { m_itemsHere.emplace_back(&item); }
     void RemoveFromInventory(Noun &);
 
+    Mud::World::World &World() const { return m_world; }
+
 private:
     Mud::World::World &m_world;
     std::vector<Server::ConnectionBase *> m_connections;
