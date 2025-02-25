@@ -17,7 +17,7 @@ namespace
 {
 int Print(lua_State *L)
 {
-    std::ostringstream &ostream = *static_cast<std::ostringstream*>(lua_touserdata(L, lua_upvalueindex(1)));
+    std::ostream &ostream = **static_cast<std::ostream**>(lua_touserdata(L, lua_upvalueindex(1)));
     for (int i = 1, top = lua_gettop(L); i <= top; ++i)
     {
         if (i > 1) ostream << " ";
@@ -68,7 +68,7 @@ int Create(lua_State *L)
     
     auto &location = world.CreateLocation(id, name,
                                           std::vector<Mud::Dictionary::Token>(
-                                              {world.Dictionary().TryInsert(name, Mud::Dictionary::NOUN)}
+                                              {world.Dictionary().Insert(name, Mud::Dictionary::NOUN)}
                                               ));
     PushNounToLua(L, location);
 
@@ -235,7 +235,7 @@ Lua::Lua(World &world)
     lua_getglobal(L, "print");
     lua_setglobal(L, "log");
 
-    lua_pushlightuserdata(L, &m_printBuffer);
+    lua_pushlightuserdata(L, &m_response);
     lua_pushcclosure(L, Print, 1);
     lua_setglobal(L, "print");
 
@@ -252,7 +252,7 @@ Lua::~Lua()
 // Returns true if Lua thinks it's a complete statement (even if it has errors)
 bool Lua::HandleLine(const std::string &line, std::ostream &response)
 {
-    m_printBuffer.str("");
+    m_response = &response;
 
     std::string expression("return ");
     expression += line + ';';
@@ -275,8 +275,6 @@ bool Lua::HandleLine(const std::string &line, std::ostream &response)
             }
         }
     }
-
-    response << m_printBuffer.str();
 
     for (int i = 1, top = lua_gettop(L); i <= top; ++i)
     {

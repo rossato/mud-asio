@@ -22,7 +22,7 @@ public:
 
 private:
     lua_State *L;
-    std::ostringstream m_printBuffer;
+    std::ostream *m_response;
 };
 
 }
