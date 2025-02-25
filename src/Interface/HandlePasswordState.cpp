@@ -1,5 +1,6 @@
 #include "HandlePasswordState.hpp"
 
+#include "Dictionary/Tokenizer.hpp"
 #include "Server/Ansi.hpp"
 #include "World/User.hpp"
 #include "HandleLoginState.hpp"
@@ -8,12 +9,12 @@
 
 using namespace Mud::Interface;
 
-void HandlePasswordState::HandleLine()
+void HandlePasswordState::HandleLine(Dictionary::Tokenizer &tokenizer)
 {
     m_interface.Write(ECHOON NEWLINE);
     auto &user = m_interface.User();
     
-    if (user.Verify(m_interface.Tokenizer().GetString()))
+    if (user.Verify(tokenizer.GetString()))
     {
         user.RegisterConnection(m_interface);
         std::cout << "New login for user " << user.Name() << "." NEWLINE;

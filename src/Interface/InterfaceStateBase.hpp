@@ -3,6 +3,11 @@
 
 namespace Mud
 {
+namespace Dictionary
+{
+class Tokenizer;
+}
+
 namespace Interface
 {
 class MudInterface;
@@ -15,7 +20,7 @@ protected:
 
 public:
     virtual ~InterfaceStateBase() {}
-    virtual void HandleLine() = 0;
+    virtual void HandleLine(Dictionary::Tokenizer &) = 0;
     virtual void Prompt() = 0;
     
 protected:

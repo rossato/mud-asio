@@ -44,10 +44,9 @@ TEST_F(HelpTest, DumpHelpVerbAction)
 
 TEST_F(HelpTest, VerbTokenMatches)
 {
-    std::string line("help help");
-    ken.Tokenizer().Str(line);
+    tokenizer.Str("help help");
 
-    auto value = VerbMatcher::Match(ken, ken.Tokenizer());
+    auto value = VerbMatcher::Match(ken, tokenizer);
 
     ASSERT_TRUE(!!value);
     EXPECT_EQ(*value, std::string("help"));

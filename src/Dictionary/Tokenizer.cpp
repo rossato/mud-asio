@@ -62,14 +62,14 @@ Token Tokenizer::GetToken()
         if (it->second)
             return it->second;
         else
-            return it->second = m_dictionary.LookUp(it->first);
+            return it->second = m_dictionary.TryLookUp(it->first);
     }
     else if (m_pos == m_end)
     {
         return Dictionary::NoWord;
     }
     const auto &nextString = ReadNextString();
-    return (m_cacheIterator-1)->second = m_dictionary.LookUp(nextString);
+    return (m_cacheIterator-1)->second = m_dictionary.TryLookUp(nextString);
 }
 
 const std::string &Tokenizer::GetString()

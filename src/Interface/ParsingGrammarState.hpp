@@ -19,12 +19,11 @@ class ParsingGrammarState : public InterfaceStateBase
 public:
     ParsingGrammarState(MudInterface &interface);
 
-    virtual void HandleLine() override;
+    virtual void HandleLine(Dictionary::Tokenizer &) override;
     virtual void Prompt() override;
 
 private:
     MudParser &m_parser;
-    Dictionary::Tokenizer &m_tokenizer;
 };
 
 }

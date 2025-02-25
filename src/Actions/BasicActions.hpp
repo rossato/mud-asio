@@ -65,7 +65,7 @@ struct GoAction
     static const std::string Description;
     static const bool RequiresPrivilege = false;
 
-    typedef DirectionMatcher     DirectMatcher;
+    typedef DirectionMatcher    DirectMatcher;
     typedef Parser::NoneMatcher IndirectMatcher;
 
     static void Act(Interface::MudInterface &, typename DirectionMatcher::ValueType);

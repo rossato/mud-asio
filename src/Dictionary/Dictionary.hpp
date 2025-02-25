@@ -43,10 +43,11 @@ public:
     static constexpr IndexType It     = {1,NOUN};
     static constexpr short DirectionOffset = 9;
 
-    IndexType LookUp(const WordType &word) const;
+    IndexType TryLookUp(const WordType &word) const; // throws on fail
+    IndexType LookUp(const WordType &word) const;    // doesn't
     // const WordType &Words(IndexType index) const
     //     { return m_words[index.GetRawIndex()]; } // this might be an issue with NUMBER category
-    IndexType TryInsert(WordType, TokenCategory);
+    IndexType Insert(WordType, TokenCategory);
 
 private:
 //    std::vector<WordType> m_words;

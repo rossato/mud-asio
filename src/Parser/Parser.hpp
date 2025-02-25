@@ -51,7 +51,7 @@ public:
     //  outcome of bad input.  Nonetheless because of the need downstream to abort processing,
     //  and because exceptions are the conventional way of doing this sort of thing, here we go.
     
-    void Parse(ContextType &c, Dictionary::Tokenizer &tokenizer) const
+    void Parse(ContextType &c, Dictionary::Tokenizer &tokenizer)
     {
         const auto &verb = tokenizer.GetString();
         VerbIndex::const_iterator verb_grammars = m_grammarIndex.find(verb);

@@ -11,6 +11,9 @@ namespace Mud
 namespace Dictionary
 {
 
+// This Tokenizer "cleans up" telnet control sequences as it goes,
+//  prefer using it to dealing with raw text.
+
 // Has std::istringstream semantics, sort of.
 
 class Tokenizer : public ItReference {

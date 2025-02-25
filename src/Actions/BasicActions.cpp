@@ -20,7 +20,7 @@ const std::string       SayAction::Description("Speak a line of text to those in
 void QuitAction::Act(Interface::MudInterface &interface)
 {
     interface.Write("Goodbye!" NEWLINE);
-    interface.Close("user request");
+    interface.Close("user quit");
     interface.ChangeState<Interface::ClosingState>();
 }
 
@@ -31,7 +31,7 @@ void LookAction::Act(Interface::MudInterface &interface)
     interface << NEWLINE << *user.GetLocation();
     for (const auto otherUser : user.GetLocation()->GetUsers())
     {
-        if (&*otherUser != &user)
+        if (otherUser != &user)
         {
             // TODO combine the users present into a single grammatic sentence.
             interface << GREENTEXT << otherUser->Name() << " is here." PLAINTEXT NEWLINE;

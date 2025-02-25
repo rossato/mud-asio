@@ -1,5 +1,6 @@
 #include "LuaState.hpp"
 
+#include "Dictionary/Tokenizer.hpp"
 #include "Server/Ansi.hpp"
 #include "World/User.hpp"
 #include "World/World.hpp"
@@ -14,9 +15,9 @@ LuaState::LuaState(MudInterface &interface)
     std::cerr << "ALERT Debug console entered by user " << interface.User().Name() << "." << std::endl;;
 }
 
-void LuaState::HandleLine()
+void LuaState::HandleLine(Dictionary::Tokenizer &tokenizer)
 {
-    auto line = m_interface.Tokenizer().DumpRestOfLine();
+    auto line = tokenizer.DumpRestOfLine();
     if (line.empty())
     {
         m_commandInProgress.str("");

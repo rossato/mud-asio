@@ -16,10 +16,8 @@ enum TokenCategory : short
     NOUN
 };
 
-class Token
+struct Token
 {
-public:
-    // Hopefully fits into a register
     short index;
     TokenCategory type;
 

@@ -30,6 +30,12 @@ public:
         Accept();
     }
 
+    // Async callbacks capturing "this", don't copy or move.
+    Acceptor(const Acceptor &)            = delete;
+    Acceptor &operator=(const Acceptor &) = delete;
+    Acceptor(Acceptor &&)                 = delete;
+    Acceptor &operator=(Acceptor &&)      = delete;
+
     virtual void Close() override
     {
         m_acceptor.close();
@@ -49,13 +55,15 @@ private:
         {
             if (!error)
             {
-                m_connectionPool.OpenNewConnection(std::move(m_nextSocket));
-
                 // std::moving into a new socket is fine,
                 //  but moving into a previously *closed* socket is problematic.
+                // The temporary here gives us an object to discard closed socket state.
                 // Debugging this error was fun because it would consistently
                 //  show up on the third connection.
-                m_nextSocket = boost::asio::ip::tcp::socket(m_acceptor.get_executor());
+
+                m_connectionPool.OpenNewConnection(
+                    boost::asio::ip::tcp::socket(std::move(m_nextSocket))
+                    );
 
                 Accept();
             }

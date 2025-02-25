@@ -13,7 +13,7 @@ Noun &WorldBuilder::NewLocation(int index, const std::string &name)
               std::forward_as_tuple(index),
               std::forward_as_tuple(
                   name,
-                  std::vector<Dictionary::Token>{m_world.Dictionary().TryInsert(name, Dictionary::NOUN)}
+                  std::vector<Dictionary::Token>{m_world.Dictionary().Insert(name, Dictionary::NOUN)}
                   )
               ).first->second);
     return *m_lastLocation;
@@ -25,7 +25,7 @@ Noun &WorldBuilder::NewItem(const std::vector<std::string> &words)
     std::transform(words.begin(), words.end(), std::back_inserter(tokens),
                    [this](const std::string &str)
                    {
-                       return m_world.Dictionary().TryInsert(str, Dictionary::NOUN);
+                       return m_world.Dictionary().Insert(str, Dictionary::NOUN);
                    });
     auto &item = m_world.CreateNoun(words.front(), std::move(tokens));
     m_lastLocation->AddItem(item);

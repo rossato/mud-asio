@@ -1,5 +1,6 @@
 #include "HandleLoginState.hpp"
 
+#include "Dictionary/Tokenizer.hpp"
 #include "Server/Ansi.hpp"
 #include "World/User.hpp"
 #include "World/World.hpp"
@@ -8,9 +9,9 @@
 
 using namespace Mud::Interface;
 
-void HandleLoginState::HandleLine()
+void HandleLoginState::HandleLine(Dictionary::Tokenizer &tokenizer)
 {
-    auto userName = m_interface.Tokenizer().GetString();
+    auto userName = tokenizer.GetString();
     if (!World::User::IsSafeUserName(userName))
     {
         m_interface.Write("User names may only consist of letters and must be at least 1 letter long." NEWLINE);

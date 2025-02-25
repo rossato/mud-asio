@@ -9,46 +9,46 @@ Dictionary::Dictionary()
 {
     std::cout << "Initializing base vocabulary..." << std::endl;
 
-    TryInsert("", NOWORD);
-    TryInsert("it", NOUN);
+    Insert("", NOWORD);
+    Insert("it", NOUN);
 
     // articles (3)
-    TryInsert("a",   ARTICLE);
-    TryInsert("an",  ARTICLE);
-    TryInsert("the", ARTICLE);
+    Insert("a",   ARTICLE);
+    Insert("an",  ARTICLE);
+    Insert("the", ARTICLE);
 
     // self (4)
-    TryInsert("me",     SELF);
-    TryInsert("myself", SELF);
-    TryInsert("I",      SELF);
-    TryInsert("self",   SELF);
+    Insert("me",     SELF);
+    Insert("myself", SELF);
+    Insert("I",      SELF);
+    Insert("self",   SELF);
 
     // directions (22)
-    TryInsert("n",         DIRECTION);
-    TryInsert("north",     DIRECTION);
-    TryInsert("e",         DIRECTION);
-    TryInsert("east",      DIRECTION);
-    TryInsert("s",         DIRECTION);
-    TryInsert("south",     DIRECTION);
-    TryInsert("w",         DIRECTION);
-    TryInsert("west",      DIRECTION);
-    TryInsert("ne",        DIRECTION);
-    TryInsert("northeast", DIRECTION);
-    TryInsert("se",        DIRECTION);
-    TryInsert("southeast", DIRECTION);
-    TryInsert("sw",        DIRECTION);
-    TryInsert("southwest", DIRECTION);
-    TryInsert("nw",        DIRECTION);
-    TryInsert("northwest", DIRECTION);
-    TryInsert("u",         DIRECTION);
-    TryInsert("up",        DIRECTION);
-    TryInsert("d",         DIRECTION);
-    TryInsert("down",      DIRECTION);
-    TryInsert("in",        DIRECTION);
-    TryInsert("out",       DIRECTION);
+    Insert("n",         DIRECTION);
+    Insert("north",     DIRECTION);
+    Insert("e",         DIRECTION);
+    Insert("east",      DIRECTION);
+    Insert("s",         DIRECTION);
+    Insert("south",     DIRECTION);
+    Insert("w",         DIRECTION);
+    Insert("west",      DIRECTION);
+    Insert("ne",        DIRECTION);
+    Insert("northeast", DIRECTION);
+    Insert("se",        DIRECTION);
+    Insert("southeast", DIRECTION);
+    Insert("sw",        DIRECTION);
+    Insert("southwest", DIRECTION);
+    Insert("nw",        DIRECTION);
+    Insert("northwest", DIRECTION);
+    Insert("u",         DIRECTION);
+    Insert("up",        DIRECTION);
+    Insert("d",         DIRECTION);
+    Insert("down",      DIRECTION);
+    Insert("in",        DIRECTION);
+    Insert("out",       DIRECTION);
 }
 
-Dictionary::IndexType Dictionary::LookUp(const Dictionary::WordType &word) const {
+Dictionary::IndexType Dictionary::TryLookUp(const Dictionary::WordType &word) const {
     // Parse as word
     const auto cit = m_dictionary.find(word);
     if (cit != m_dictionary.end())
@@ -70,8 +70,17 @@ Dictionary::IndexType Dictionary::LookUp(const Dictionary::WordType &word) const
     // }
 }
 
-Dictionary::IndexType Dictionary::TryInsert(Dictionary::WordType word,
-                                            TokenCategory category) {
+Dictionary::IndexType Dictionary::LookUp(const Dictionary::WordType &word) const {
+    // Parse as word
+    const auto cit = m_dictionary.find(word);
+    if (cit != m_dictionary.end())
+        return cit->second;
+
+    return NoWord;
+}
+
+Dictionary::IndexType Dictionary::Insert(Dictionary::WordType word,
+                                         TokenCategory category) {
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
     
     const auto it = m_dictionary.find(word);

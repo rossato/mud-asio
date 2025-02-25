@@ -26,7 +26,7 @@ void GrammarBuilder<ContextType>::NewVerb(std::vector<std::string> &&verbs)
 template <class ContextType>
 GrammarBuilder<ContextType>& GrammarBuilder<ContextType>::ExactWord(const std::string &word)
 {
-    m_lastGrammarLine->EmplaceRule(m_dictionary.TryInsert(word, Dictionary::GRAMMAR));
+    m_lastGrammarLine->EmplaceRule(m_dictionary.Insert(word, Dictionary::GRAMMAR));
 
     if (!m_suppressHelp) m_verbHelp << " " << word;
     return *this;
@@ -38,7 +38,7 @@ GrammarBuilder<ContextType>& GrammarBuilder<ContextType>::OneOf(const std::vecto
     bool first = true;
     for (auto &word : words)
     {
-        m_lastGrammarLine->EmplaceRule(m_dictionary.TryInsert(word, Dictionary::GRAMMAR));
+        m_lastGrammarLine->EmplaceRule(m_dictionary.Insert(word, Dictionary::GRAMMAR));
 
         if (!m_suppressHelp)
         {

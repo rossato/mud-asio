@@ -7,8 +7,8 @@ using namespace Mud::Server;
 
 void ConnectionBase::Close(const std::string &reason)
 {
-    std::cout << "Server is closing connection #" << m_connectionNumber
-              << " for reason: " << reason << "." << std::endl;
+    std::cout << "Connection #" << m_connectionNumber
+              << " is closing for reason: " << reason << "." << std::endl;
 
     m_socket.shutdown(SocketType::shutdown_receive);
 }
@@ -64,8 +64,8 @@ void ConnectionBase::WriteToSocket()
             //  Workaround would be:
             //  boost::asio::defer(m_socket.get_executor(), std::move(m_onClose));
 
-            m_onClose();
             m_socket.close();
+            m_onClose();
         }
     });
 }

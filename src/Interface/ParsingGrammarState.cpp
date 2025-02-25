@@ -9,16 +9,16 @@
 using namespace Mud::Interface;
 
 ParsingGrammarState::ParsingGrammarState(MudInterface &interface)
-    : InterfaceStateBase(interface), m_parser(interface.Parser()), m_tokenizer(interface.Tokenizer())
+    : InterfaceStateBase(interface), m_parser(interface.Parser())
 {
     Mud::Actions::LookAction::Act(m_interface);
 }
 
-void ParsingGrammarState::HandleLine()
+void ParsingGrammarState::HandleLine(Dictionary::Tokenizer &tokenizer)
 {
     try
     {
-        m_parser.Parse(m_interface, m_tokenizer);
+        m_parser.Parse(m_interface, tokenizer);
     }
     catch (const Dictionary::WordNotFoundException& e)
     {

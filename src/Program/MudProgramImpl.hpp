@@ -20,7 +20,8 @@ class MudProgramImpl
     friend MudProgram;
 public:
     MudProgramImpl(MudProgram &program)
-        : m_world(m_dictionary),
+        : m_tokenizer(m_dictionary),
+          m_world(m_dictionary),
           m_mudFactory(program),
           m_httpFactory(m_server)
     {
@@ -38,6 +39,7 @@ public:
     }
 private:
     Dictionary::Dictionary m_dictionary;
+    Dictionary::Tokenizer m_tokenizer;
     World::World m_world;
     Interface::MudParser m_parser;
     Server::Server m_server;

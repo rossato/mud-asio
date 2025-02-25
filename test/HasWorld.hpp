@@ -27,10 +27,12 @@ class HasWorld : public ResetsWorld
 protected:
     HasWorld()
         : world(theProgram().World()),
+          tokenizer(theProgram().Tokenizer()),
           ken("ken")
         {}
 
     World::World &world;
+    Dictionary::Tokenizer &tokenizer;
     TestInterface ken;
 };
     

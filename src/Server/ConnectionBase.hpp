@@ -25,6 +25,8 @@ public:
     // Async callbacks are out there, don't copy or move.
     ConnectionBase(const ConnectionBase &)            = delete;
     ConnectionBase &operator=(const ConnectionBase &) = delete;
+    ConnectionBase(ConnectionBase &&)                 = delete;
+    ConnectionBase &operator=(ConnectionBase &&)      = delete;
 
     template <class T>
     void Write(const T &message)

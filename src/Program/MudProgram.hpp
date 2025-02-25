@@ -9,6 +9,7 @@ namespace Mud
 namespace Dictionary
 {
 class Dictionary;
+class Tokenizer;
 }
 namespace Server
 {
@@ -43,14 +44,16 @@ public:
     void Run();
 
     Dictionary::Dictionary &Dictionary() { return m_dictionary; }
-    World::World &World() { return m_world; }
-    Interface::MudParser &Parser() { return m_parser; }
-    Server::Server &Server() { return m_server; }
+    Dictionary::Tokenizer  &Tokenizer()  { return m_tokenizer;  }
+    World::World           &World()      { return m_world;      }
+    Interface::MudParser   &Parser()     { return m_parser;     }
+    Server::Server         &Server()     { return m_server;     }
     
 private:
     std::unique_ptr<MudProgramImpl> m_impl;
 
     Dictionary::Dictionary &m_dictionary;
+    Dictionary::Tokenizer &m_tokenizer;
     World::World &m_world;
     Interface::MudParser &m_parser;
     Server::Server &m_server;

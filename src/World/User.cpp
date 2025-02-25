@@ -7,7 +7,7 @@
 using namespace Mud::World;
 
 User::User(Mud::World::World &world, const std::string &name, Noun &startingPlace)
-    : Noun(name, {world.Dictionary().TryInsert(name, Dictionary::NOUN)}),
+    : Noun(name, {world.Dictionary().Insert(name, Dictionary::NOUN)}),
       m_world(world)
 {
     m_here = &startingPlace;

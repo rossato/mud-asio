@@ -18,6 +18,12 @@ public:
     ConnectionPool(ConnectionFactoryType &factory)
         : m_factory(factory), m_peakConcurrentConnections(0) {}
 
+    // Async callbacks capturing "this", don't copy or move.
+    ConnectionPool(const ConnectionPool &)            = delete;
+    ConnectionPool &operator=(const ConnectionPool &) = delete;
+    ConnectionPool(ConnectionPool &&)                 = delete;
+    ConnectionPool &operator=(ConnectionPool &&)      = delete;
+
     void OpenNewConnection(boost::asio::ip::tcp::socket &&socket)
     {
         auto newConnection = m_closedConnections.begin();

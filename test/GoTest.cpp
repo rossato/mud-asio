@@ -42,22 +42,22 @@ TEST_F(GoTest, GoBadDirectionFails)
 TEST_F(GoTest, DirectionTokenMatches)
 {
     std::string line("go east");
-    ken.Tokenizer().Str(line);
-    ken.Tokenizer().GetString();
+    tokenizer.Str(line);
+    tokenizer.GetString();
     EXPECT_EQ(
         Mud::World::E,
-        DirectionMatcher::Match(ken, ken.Tokenizer())
+        DirectionMatcher::Match(ken, tokenizer)
         );
 }
 
 TEST_F(GoTest, BadDirectionDoesntMatch)
 {
     std::string line("go about");
-    ken.Tokenizer().Str(line);
-    ken.Tokenizer().GetString();
+    tokenizer.Str(line);
+    tokenizer.GetString();
     EXPECT_EQ(
         Mud::World::NODIR,
-        DirectionMatcher::Match(ken, ken.Tokenizer())
+        DirectionMatcher::Match(ken, tokenizer)
         );
 }
 
